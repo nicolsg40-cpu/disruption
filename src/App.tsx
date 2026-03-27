@@ -4,7 +4,7 @@
  */
 
 console.log("App.tsx: module load");
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { 
   DISRUPCIONES, 
   TITULARES, 
@@ -16,7 +16,7 @@ import {
   type FinalResult
 } from "./constants";
 import { ScreenWrapper, ProgressBar, Button } from "./components/UI";
-import { ChevronLeft, Zap, Shield, Brain, Wallet, User, Users, CheckCircle2, Globe, Loader2 } from "lucide-react";
+import { ChevronLeft, Zap, Shield, Brain, Wallet, User, Users, CheckCircle2, Globe, Loader2, Volume2, VolumeX } from "lucide-react";
 import { db, auth } from "./firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
@@ -84,6 +84,8 @@ function handleFirestoreError(error: unknown, operationType: OperationType, path
 export default function App() {
   const [screen, setScreen] = useState<Screen>("welcome");
   const [isSaving, setIsSaving] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const [state, setState] = useState<AppState>({
     disruptionId: null,
     roleId: null,
@@ -126,10 +128,46 @@ export default function App() {
     }
   };
 
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.muted = isMuted;
+      if (!isMuted) {
+        audioRef.current.play().catch(e => console.log("Audio play blocked:", e));
+      }
+    }
+  }, [isMuted]);
+
+  const toggleMute = () => {
+    setIsMuted(!isMuted);
+  };
+
+  const startApp = () => {
+    setScreen("disruption");
+    // Try to unmute/play on first interaction
+    setIsMuted(false);
+  };
+
   const currentDisruption = state.disruptionId ? DISRUPCIONES[state.disruptionId] : null;
 
   return (
     <div className="min-h-screen bg-bg flex justify-center items-start overflow-x-hidden">
+      {/* Background Audio */}
+      <audio 
+        ref={audioRef}
+        src="distopic.mp3" 
+        loop 
+        playsInline
+      />
+
+      {/* Mute Toggle */}
+      <button 
+        onClick={toggleMute}
+        className="fixed top-4 right-4 z-50 p-2.5 rounded-full bg-black/40 backdrop-blur-md border border-white/10 text-white/70 hover:text-white hover:bg-black/60 transition-all active:scale-95 shadow-lg"
+        title={isMuted ? "Activar sonido" : "Silenciar"}
+      >
+        {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+      </button>
+
       <div className="w-full max-w-[420px] min-h-screen flex flex-col relative bg-bg border-x border-border/50">
         
         {/* Welcome Screen */}
@@ -151,7 +189,7 @@ export default function App() {
               </p>
             </div>
           </div>
-          <Button onClick={() => setScreen("disruption")}>
+          <Button onClick={startApp}>
             Empezar →
           </Button>
         </ScreenWrapper>
