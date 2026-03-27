@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+console.log("App.tsx: module load");
 import { useState, useEffect } from "react";
 import { 
   DISRUPCIONES, 

@@ -1,3 +1,4 @@
+console.log("UI.tsx: module load");
 import { motion, AnimatePresence } from "motion/react";
 import { ReactNode } from "react";
 
@@ -7,20 +8,11 @@ interface ScreenWrapperProps {
 }
 
 export const ScreenWrapper = ({ children, isVisible }: ScreenWrapperProps) => {
+  if (!isVisible) return null;
   return (
-    <AnimatePresence mode="wait">
-      {isVisible && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          transition={{ duration: 0.3, ease: "easeOut" }}
-          className="flex flex-col h-full w-full p-6 pt-8"
-        >
-          {children}
-        </motion.div>
-      )}
-    </AnimatePresence>
+    <div className="flex flex-col h-full w-full p-6 pt-8">
+      {children}
+    </div>
   );
 };
 

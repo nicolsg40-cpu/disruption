@@ -1,3 +1,4 @@
+console.log("constants.ts: module load");
 export interface Disruption {
   id: number;
   tag: string;
