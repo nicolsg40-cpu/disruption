@@ -1,0 +1,25 @@
+{
+  "entities": {
+    "Interaction": {
+      "title": "User Interaction",
+      "description": "A record of a user's choices and final action in the Hackea la Disrupción experience.",
+      "type": "object",
+      "properties": {
+        "disruptionId": { "type": "integer", "description": "ID of the chosen disruption" },
+        "roleId": { "type": "integer", "description": "ID of the chosen role" },
+        "impactId": { "type": "string", "description": "ID of the chosen impact area" },
+        "restrictionId": { "type": "string", "description": "ID of the chosen restriction" },
+        "actionText": { "type": "string", "description": "The user's final action text" },
+        "timestamp": { "type": "string", "format": "date-time", "description": "When the interaction occurred" },
+        "userId": { "type": "string", "description": "Optional user ID if authenticated" }
+      },
+      "required": ["disruptionId", "roleId", "impactId", "restrictionId", "actionText", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/interactions/{interactionId}": {
+      "schema": "Interaction",
+      "description": "Collection of all user interactions"
+    }
+  }
+}
