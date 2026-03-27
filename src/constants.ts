@@ -38,7 +38,7 @@ export const TITULARES: Record<string, string> = {
   '1-4': '"Sindicato de contadores denuncia traslado masivo tras negociación fallida. \'Usaron el offshoring como arma en la mesa\'."',
   '2-1': '"4.200 jóvenes pierden trabajos part-time de un solo golpe. \'Llevaba 8 meses, ahora ni puedo apelar\', dice estudiante de 19 años."',
   '2-2': '"Plataforma desactiva cuentas colombianas masivamente. Afectados perdieron clientes y reputación acumulada en años — sin explicación."',
-  '2-3': '"Rappi desactiva 3.800 repartidores en una noche. Sin aviso, sin cesantías. \'El algoritmo me despidió mientras dormía\'."',
+  '2-3': '"Empresa desactiva 3.800 repartidores en una noche. Sin aviso, sin cesantías. \'El algoritmo me despidió mientras dormía\'."',
   '2-4': '"Organización intenta demandar desactivación masiva — pero no encuentra a quién. Empresa en Irlanda, servidor en EE.UU., trabajador en Soacha."',
   '3-1': '"Paro estudiantil pierde fuerza en horas: empresa contrata personal remoto para mantener operaciones. \'Ni sabíamos que era legal\'."',
   '3-2': '"Desarrolladores en huelga reemplazados por equipo en Argentina en menos de 24 horas. La negociación que duró semanas — irrelevante en un día."',
