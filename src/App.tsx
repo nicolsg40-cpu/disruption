@@ -20,7 +20,7 @@ import { ChevronLeft, Zap, Shield, Brain, Wallet, User, Users, CheckCircle2, Glo
 import { db, auth } from "./firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
-type Screen = "welcome" | "disruption" | "role" | "impact" | "chain" | "action" | "final";
+type Screen = "welcome" | "disruption" | "role" | "headline" | "impact" | "chain" | "action" | "final";
 
 interface AppState {
   disruptionId: number | null;
@@ -196,7 +196,7 @@ export default function App() {
 
         {/* Disruption Selection */}
         <ScreenWrapper isVisible={screen === "disruption"}>
-          <ProgressBar step={1} totalSteps={5} label="Paso 1 de 5 · Elige tu disrupción" />
+          <ProgressBar step={1} totalSteps={6} label="Paso 1 de 6 · Elige tu disrupción" />
           <h2 className="text-2xl font-bold mb-2">¿Qué crisis te preocupa más?</h2>
           <p className="text-sm text-zinc-400 mb-6">Cada disrupción abre un camino diferente. Elige la que más te toca.</p>
           
@@ -226,7 +226,7 @@ export default function App() {
 
         {/* Role Selection */}
         <ScreenWrapper isVisible={screen === "role"}>
-          <ProgressBar step={2} totalSteps={5} label="Paso 2 de 5 · Tu rol" />
+          <ProgressBar step={2} totalSteps={6} label="Paso 2 de 6 · Tu rol" />
           <div className="flex justify-between items-center mb-6">
             <button onClick={() => setScreen("disruption")} className="text-xs text-zinc-500 hover:text-zinc-300 flex items-center gap-1">
               <ChevronLeft size={14} /> volver
@@ -248,7 +248,10 @@ export default function App() {
             ].map((r) => (
               <button
                 key={r.id}
-                onClick={() => setState(prev => ({ ...prev, roleId: r.id }))}
+                onClick={() => {
+                  setState(prev => ({ ...prev, roleId: r.id }));
+                  setScreen("headline");
+                }}
                 className={`flex items-center gap-4 p-4 rounded-xl border transition-all text-left ${
                   state.roleId === r.id 
                     ? "border-hack-red bg-hack-red/10 text-white" 
@@ -262,25 +265,61 @@ export default function App() {
               </button>
             ))}
           </div>
+        </ScreenWrapper>
 
-          {state.roleId && (
-            <div className="animate-in fade-in slide-in-from-bottom-4 duration-300 mt-auto">
-              <div className="bg-hack-red/5 border border-hack-red/20 p-4 rounded-xl mb-6">
-                <p className="text-[10px] text-hack-red uppercase tracking-widest font-bold mb-2">Tu titular — hoy</p>
-                <p className="text-sm italic text-zinc-200 leading-relaxed">
+        {/* Headline Screen (Newspaper Style) */}
+        <ScreenWrapper isVisible={screen === "headline"}>
+          <ProgressBar step={3} totalSteps={6} label="Extra! Extra! · Tu noticia" />
+          <div className="flex justify-between items-center mb-6">
+            <button onClick={() => setScreen("role")} className="text-xs text-zinc-500 hover:text-zinc-300 flex items-center gap-1">
+              <ChevronLeft size={14} /> volver
+            </button>
+          </div>
+
+          <div className="bg-[#f4f1ea] text-[#1a1a1a] p-6 shadow-2xl transform -rotate-1 relative overflow-hidden border-b-4 border-black/20">
+            <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/paper-fibers.png')]" />
+            
+            <div className="border-b-2 border-black pb-2 mb-4 flex justify-between items-end">
+              <span className="font-serif font-bold text-[10px] uppercase tracking-tighter">EL DIARIO DEL MAÑANA</span>
+              <span className="font-serif text-[9px]">{new Date().toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+            </div>
+
+            <div className="text-center mb-4">
+              <span className="inline-block bg-black text-white text-[8px] px-2 py-0.5 font-bold uppercase tracking-widest mb-2">ÚLTIMA HORA</span>
+              <h2 className="font-serif text-2xl font-black leading-none tracking-tight uppercase mb-2">
+                {currentDisruption?.titulo}
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-3 gap-4 border-t border-black/10 pt-4">
+              <div className="col-span-3">
+                <p className="font-serif text-lg leading-tight font-bold mb-3 first-letter:text-5xl first-letter:font-black first-letter:float-left first-letter:mr-2 first-letter:mt-1">
                   {TITULARES[`${state.disruptionId}-${state.roleId}`]}
                 </p>
+                <div className="h-px bg-black/10 w-full mb-3" />
+                <p className="text-[10px] leading-relaxed font-serif opacity-80">
+                  Reportes indican que miles de {state.roleId === 1 ? 'estudiantes' : state.roleId === 2 ? 'trabajadores digitales' : state.roleId === 3 ? 'repartidores' : 'líderes'} están siendo afectados por esta medida sin precedentes. La incertidumbre crece en los sectores clave de la economía digital colombiana.
+                </p>
               </div>
-              <Button onClick={() => setScreen("impact")}>
-                Esto me afecta →
-              </Button>
             </div>
-          )}
+
+            <div className="mt-6 pt-4 border-t-2 border-black flex justify-center">
+              <div className="w-12 h-12 rounded-full border border-black/20 flex items-center justify-center opacity-20 grayscale">
+                <Globe size={24} />
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-8">
+            <Button onClick={() => setScreen("impact")} className="w-full">
+              Esto me afecta →
+            </Button>
+          </div>
         </ScreenWrapper>
 
         {/* Impact Assessment */}
         <ScreenWrapper isVisible={screen === "impact"}>
-          <ProgressBar step={3} totalSteps={5} label="Paso 3 de 5 · ¿Dónde duele?" />
+          <ProgressBar step={4} totalSteps={6} label="Paso 4 de 6 · ¿Dónde duele?" />
           <div className="flex justify-between items-center mb-6">
             <button onClick={() => setScreen("role")} className="text-xs text-zinc-500 hover:text-zinc-300 flex items-center gap-1">
               <ChevronLeft size={14} /> volver
@@ -336,7 +375,7 @@ export default function App() {
 
         {/* Chain Reaction */}
         <ScreenWrapper isVisible={screen === "chain"}>
-          <ProgressBar step={4} totalSteps={5} label="Paso 4 de 5 · El efecto dominó" />
+          <ProgressBar step={5} totalSteps={6} label="Paso 5 de 6 · El efecto dominó" />
           <div className="flex justify-between items-center mb-6">
             <button onClick={() => setScreen("impact")} className="text-xs text-zinc-500 hover:text-zinc-300 flex items-center gap-1">
               <ChevronLeft size={14} /> volver
@@ -389,7 +428,7 @@ export default function App() {
 
         {/* Action Input */}
         <ScreenWrapper isVisible={screen === "action"}>
-          <ProgressBar step={5} totalSteps={5} label="Paso 5 de 5 · Tu jugada" />
+          <ProgressBar step={6} totalSteps={6} label="Paso 6 de 6 · Tu jugada" />
           <div className="flex justify-between items-center mb-6">
             <button onClick={() => setScreen("chain")} className="text-xs text-zinc-500 hover:text-zinc-300 flex items-center gap-1">
               <ChevronLeft size={14} /> volver
@@ -457,7 +496,7 @@ export default function App() {
 
         {/* Final Result */}
         <ScreenWrapper isVisible={screen === "final"}>
-          <ProgressBar step={5} totalSteps={5} label="Experiencia completa" />
+          <ProgressBar step={6} totalSteps={6} label="Experiencia completa" />
           
           <div className="text-center mb-8">
             <div className="w-12 h-12 rounded-full bg-hack-green/10 border border-hack-green flex items-center justify-center mx-auto mb-4 text-hack-green">
