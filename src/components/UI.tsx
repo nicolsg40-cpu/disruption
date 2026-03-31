@@ -1,6 +1,6 @@
 console.log("UI.tsx: module load");
 import { motion, AnimatePresence } from "motion/react";
-import { ReactNode } from "react";
+import { ReactNode, useMemo } from "react";
 
 interface ScreenWrapperProps {
   children: ReactNode;
@@ -32,7 +32,7 @@ export const ProgressBar = ({ step, totalSteps, label }: ProgressBarProps) => {
           </li>
         ))}
       </ul>
-      <p className="text-[10px] text-black uppercase tracking-widest mt-2 font-bold">
+      <p className="text-[10px] text-neon-cyan uppercase tracking-widest mt-2 font-bold font-mono">
         {label}
       </p>
     </div>
