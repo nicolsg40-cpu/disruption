@@ -10,9 +10,9 @@ interface ScreenWrapperProps {
 export const ScreenWrapper = ({ children, isVisible }: ScreenWrapperProps) => {
   if (!isVisible) return null;
   return (
-    <div className="flex flex-col h-full w-full p-6 pt-8">
+    <section className="cyberpunk black flex flex-col h-full w-full p-6 pt-8 min-h-screen">
       {children}
-    </div>
+    </section>
   );
 };
 
@@ -23,17 +23,16 @@ interface ProgressBarProps {
 }
 
 export const ProgressBar = ({ step, totalSteps, label }: ProgressBarProps) => {
-  const progress = (step / totalSteps) * 100;
   return (
     <div className="mb-6">
-      <div className="h-1 w-full bg-border rounded-full overflow-hidden">
-        <motion.div
-          initial={{ width: 0 }}
-          animate={{ width: `${progress}%` }}
-          className="h-full bg-hack-red"
-        />
-      </div>
-      <p className="text-[10px] text-zinc-500 uppercase tracking-widest mt-2">
+      <ul className="steps cyberpunk">
+        {Array.from({ length: totalSteps }).map((_, i) => (
+          <li key={i} className={i < step ? "current" : ""}>
+            {i === step - 1 && <span className="sr-only">{label}</span>}
+          </li>
+        ))}
+      </ul>
+      <p className="text-[10px] text-yellow-color uppercase tracking-widest mt-2 font-bold">
         {label}
       </p>
     </div>
@@ -49,17 +48,16 @@ interface ButtonProps {
 }
 
 export const Button = ({ onClick, children, variant = "primary", className = "", disabled = false }: ButtonProps) => {
-  const baseStyles = "w-full py-4 rounded-xl font-medium transition-all active:scale-95 disabled:opacity-50 disabled:pointer-events-none";
-  const variants = {
-    primary: "bg-hack-red text-white hover:bg-hack-red/90",
-    secondary: "bg-transparent border border-border text-zinc-400 hover:border-zinc-500 hover:text-zinc-200"
-  };
-
+  const baseStyles = "cyberpunk w-full disabled:opacity-50 disabled:pointer-events-none";
+  
   return (
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`${baseStyles} ${variants[variant]} ${className}`}
+      className={`${baseStyles} ${className}`}
+      style={{
+        "--background-color": variant === "primary" ? "var(--red-color)" : "var(--blue-color)"
+      } as any}
     >
       {children}
     </button>
