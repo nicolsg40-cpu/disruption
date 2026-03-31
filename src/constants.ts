@@ -5,168 +5,303 @@ export interface Disruption {
   color: string;
   titulo: string;
   sub: string;
+  opciones: string[];
 }
+
+export interface Role {
+  id: string;
+  name: string;
+  description: string;
+}
+
+export const ROLES: Role[] = [
+  { id: 'empleado', name: 'Empleado experto en TIC', description: 'Buscas estabilidad y respeto a tus derechos.' },
+  { id: 'emprendedor', name: 'Emprendedor de una startup', description: 'Buscas innovación y agilidad en el mercado.' },
+  { id: 'funcionario', name: 'Funcionario del gobierno', description: 'Buscas regulación, orden y protección social.' },
+  { id: 'empresario', name: 'Empresario del sector TIC', description: 'Buscas rentabilidad y competitividad global.' },
+  { id: 'estudiante', name: 'Estudiante', description: 'Buscas oportunidades y un futuro prometedor.' },
+];
 
 export const DISRUPCIONES: Record<number, Disruption> = {
   1: {
     id: 1,
-    tag: 'El gran traslado',
-    color: 'hack-red',
-    titulo: 'Tu empresa movió tu trabajo a otro país en 72 horas',
-    sub: 'Offshoring digital · derechos laborales'
+    tag: 'SOLAR EMP',
+    color: 'hack-cyan',
+    titulo: 'Una tormenta solar tumbó las redes eléctricas, las comunicaciones y los sistemas de gas y agua.',
+    sub: 'Infraestructura · Resiliencia · Caos',
+    opciones: [
+      'Infraestructura compartida: Coordinación para proteger sistemas esenciales.',
+      'Generador propio: Inversión en asegurar operación propia con recursos propios.',
+      'Esperar que pase: Asumir que es temporal y esperar al Estado.'
+    ]
   },
   2: {
     id: 2,
-    tag: 'Desactivado',
-    color: 'hack-red',
-    titulo: 'Una notificación borró tu trabajo mientras dormías',
-    sub: 'Plataformas · despido algorítmico'
+    tag: 'G0SS1P9R4PH',
+    color: 'hack-pink',
+    titulo: 'Un hackeo cuántico expuso todas las conversaciones privadas de una app de mensajería.',
+    sub: 'Privacidad · Transparencia · Seguridad',
+    opciones: [
+      'Transparencia con límites: Exigir regulación clara sobre datos y derechos.',
+      'Gestión de daños propia: Controlar el impacto sobre reputación propia.',
+      'No tengo nada que esconder: Asumir que la exposición no me afecta.'
+    ]
   },
   3: {
     id: 3,
-    tag: 'The Scab',
-    color: 'hack-red',
-    titulo: 'Tu huelga duró 6 horas. Una app consiguió reemplazantes del otro lado del mundo antes del almuerzo.',
-    sub: 'Rompehuelgas digital · organización colectiva · poder de negociación'
+    tag: 'FAKEFRONTATIONS',
+    color: 'hack-yellow',
+    titulo: 'Deepfakes en redes desataron protestas masivas y violencia con cientos de muertos.',
+    sub: 'Desinformación · Confianza · Verificación',
+    opciones: [
+      'Verificación abierta: Crear y difundir protocolos de verificación accesibles.',
+      'Control de narrativa: Usar canales propios para contrarrestar con otra versión.',
+      'Silencio estratégico: No decir nada para no amplificar la desinformación.'
+    ]
   },
   4: {
     id: 4,
-    tag: 'Borderless Pickett',
-    color: 'hack-red',
-    titulo: 'Tu empresa tercerizó tu trabajo al extranjero en días. El motivo: pediste mejores condiciones.',
-    sub: 'Offshoring digital · sindicalismo · jurisdicción laboral'
+    tag: 'RANSOM WATER',
+    color: 'hack-cyan',
+    titulo: 'Un ransomware paralizó toda la infraestructura de agua y alcantarillado del país.',
+    sub: 'Ciberataque · Servicios Básicos · Respuesta',
+    opciones: [
+      'Respuesta coordinada: Equipo público-privado de respuesta inmediata.',
+      'Pago silencioso: Pagar el rescate para restaurar el acceso rápido.',
+      'Agua embotellada: Comprar reservas para organización o familia.'
+    ]
   },
   5: {
     id: 5,
-    tag: 'Credential Jam',
-    color: 'hack-red',
-    titulo: 'Tus títulos y licencias dejaron de valer de un día para otro. No puedes trabajar.',
-    sub: 'Reconocimiento de credenciales · mercados informales · caos sectorial'
+    tag: 'CARSTRUCK',
+    color: 'hack-pink',
+    titulo: 'Trabajadores en huelga apagaron de forma remota todos los vehículos de la marca.',
+    sub: 'Conflicto Laboral · Control Remoto · Seguridad',
+    opciones: [
+      'Mesa de negociación urgente: Negociación inmediata con mediación independiente.',
+      'Fuerza y control: Presionar para que autoridades fuercen la restauración.',
+      'Esperar que se cansen: No intervenir y esperar que cedan.'
+    ]
+  },
+  6: {
+    id: 6,
+    tag: 'ROGUE AI',
+    color: 'hack-yellow',
+    titulo: 'Una IA del gobierno y sistema financiero empezó a tomar decisiones autónomas.',
+    sub: 'IA Autónoma · Auditoría · Responsabilidad',
+    opciones: [
+      'Apagón controlado: Suspender el sistema hasta auditoría humana completa.',
+      'Parche rápido: Solución técnica inmediata sin detener el sistema.',
+      'Confiar en el sistema: Asumir que los desarrolladores corregirán el error.'
+    ]
+  },
+  7: {
+    id: 7,
+    tag: 'SUPPLYSTOP',
+    color: 'hack-cyan',
+    titulo: 'Crisis climática y conflictos cerraron las rutas comerciales más importantes.',
+    sub: 'Logística · Escasez · Mercados Negros',
+    opciones: [
+      'Cadenas locales: Desarrollar proveedores locales y regionales.',
+      'Mercado negro controlado: Acceder a materiales por canales informales.',
+      'Parar y esperar: Suspender operaciones hasta que rutas se restauren.'
+    ]
+  },
+  8: {
+    id: 8,
+    tag: 'ECOVIGILANTES',
+    color: 'hack-pink',
+    titulo: 'Grupos de ecovigilantes empezaron a sabotear todo lo que consideran insostenible.',
+    sub: 'Activismo Radical · Sabotaje · Diálogo',
+    opciones: [
+      'Diálogo con urgencia: Proponer espacios reales de incidencia con compromisos.',
+      'Criminalizar y frenar: Respuesta legal y policial contundente.',
+      'Ignorar como fenómeno marginal: Tratar los actos como hechos aislados.'
+    ]
+  },
+  9: {
+    id: 9,
+    tag: 'SIMPLY WAR',
+    color: 'hack-yellow',
+    titulo: 'Todo el continente es zona de conflicto. Ataques golpean infraestructura clave.',
+    sub: 'Guerra · Desinformación · Coordinación',
+    opciones: [
+      'Pacto civil: Priorizar protección a población y servicios esenciales.',
+      'Primero el sector estratégico: Concentrar recursos en lo más valioso.',
+      'Neutralidad táctica: Evitar comprometerse hasta que panorama sea claro.'
+    ]
   },
   10: {
     id: 10,
-    tag: 'Unionware',
-    color: 'hack-red',
-    titulo: 'Hackearon a los líderes sindicales. Todo — bases de datos, negociaciones, casos — está filtrado.',
-    sub: 'Ciberseguridad laboral · organización sindical · confianza digital'
+    tag: 'PUPPETEER',
+    color: 'hack-cyan',
+    titulo: 'Un gobierno usó sus empresas tecnológicas como armas contra otros países.',
+    sub: 'Soberanía · Dependencia · Geopolítica',
+    opciones: [
+      'Soberanía tecnológica: Construir alternativas locales o regionales.',
+      'Negociación bilateral: Acuerdo directo con el país que controla la tecnología.',
+      'Seguir como siempre: Asumir que es un conflicto entre estados.'
+    ]
   },
   11: {
     id: 11,
-    tag: 'Algocuts',
-    color: 'hack-red',
-    titulo: 'La plataforma cambió su algoritmo sin avisar. Tus ingresos cayeron a la mitad esta semana.',
-    sub: 'Algoritmos de pago · trabajo de plataforma · opacidad digital'
+    tag: 'BRAIN LOCKOUT',
+    color: 'hack-pink',
+    titulo: 'El sistema operativo de neurointerfaz más usado del mundo se cayó. Millones de trabajadores bloqueados.',
+    sub: 'Neurotecnología · Dependencia · Colapso',
+    opciones: [
+      'Soberanía cognitiva: Exigir regulación: ninguna empresa puede controlar acceso cognitivo sin respaldo público.',
+      'Primero los míos: Priorizar restaurar acceso para mi sector usando canales privados o pagando premium.',
+      'Modo manual: Volver a procesos análogos mientras pasa la crisis. No intervenir en el debate.'
+    ]
+  },
+  12: {
+    id: 12,
+    tag: 'INVISIBLE HAND',
+    color: 'hack-yellow',
+    titulo: 'Lo que parecía un grupo diverso de inversionistas resultó ser una sola organización coordinada.',
+    sub: 'Monopolio · Transparencia · Poder',
+    opciones: [
+      'Auditoría pública urgente: Exigir transparencia total sobre propiedad de servicios esenciales.',
+      'Adaptarse al nuevo poder: Establecer relación favorable con el nuevo actor dominante antes que otros.',
+      'El mercado se regula solo: Asumir que la competencia corregirá la concentración. No intervenir.'
+    ]
+  },
+  13: {
+    id: 13,
+    tag: 'TAX\'M',
+    color: 'hack-cyan',
+    titulo: 'Una sola entidad monopolizó el procesamiento de datos avanzado e impuso cobros absurdos.',
+    sub: 'Brecha Digital · Monopolio · Acceso',
+    opciones: [
+      'Infraestructura común: Unirse con otros para construir infraestructura de datos compartida y sin fines de lucro.',
+      'Pagar y seguir: Asumir el nuevo costo como parte del negocio. Quien pueda pagar, paga.',
+      'Esperar regulación: Asumir que los gobiernos intervendrán el monopolio eventualmente.'
+    ]
+  },
+  14: {
+    id: 14,
+    tag: 'DOPPLEGANGER',
+    color: 'hack-pink',
+    titulo: 'La tecnología deepfake alcanzó perfección en tiempo real. Atacantes se hacen pasar por CEOs.',
+    sub: 'Identidad · Deepfakes · Verificación',
+    opciones: [
+      'Estándares colectivos: Establecer protocolos de verificación de identidad que no dependan de una sola tecnología.',
+      'Tecnología propia: Invertir en solución propia de verificación interna. Crea ecosistema fragmentado.',
+      'Volver a lo análogo: Revertir decisiones críticas a verificación presencial. Paraliza trabajo remoto.'
+    ]
+  },
+  15: {
+    id: 15,
+    tag: 'DAM(N)',
+    color: 'hack-yellow',
+    titulo: 'Una represa enorme colapsó. Millones de desplazados, infraestructura arrasada.',
+    sub: 'Desastre · Ayuda Humanitaria · Geopolítica',
+    opciones: [
+      'Respuesta humanitaria primero: Priorizar atención a desplazados por encima de intereses económicos o políticos.',
+      'Reconstrucción estratégica: Priorizar restaurar infraestructura económica antes que la atención social.',
+      'Aceptar cualquier ayuda: Aceptar todos los ofrecimientos de ayuda internacional sin condiciones ni coordinación.'
+    ]
+  },
+  16: {
+    id: 16,
+    tag: 'JURISDICTION HOP',
+    color: 'hack-cyan',
+    titulo: 'Una empresa cambió su sede legal a otro país en 72 horas sin mover un solo trabajador.',
+    sub: 'Jurisdicción · Derechos · Vacío Legal',
+    opciones: [
+      'Red transfronteriza: Conectarse con organizaciones laborales del país donde la empresa "aterrizó".',
+      'Negocio es negocio: Aprovechar la nueva jurisdicción para operar con menos restricciones.',
+      'No es mi problema: El cambio no me afecta directamente todavía. Seguir trabajando como si nada.'
+    ]
+  },
+  17: {
+    id: 17,
+    tag: 'FIRED BY MSG',
+    color: 'hack-pink',
+    titulo: 'Miles de personas recibieron notificación automática de "desactivación". Sin reunión ni explicación.',
+    sub: 'Despido Algorítmico · Plataformas · Derechos',
+    opciones: [
+      'Proceso colectivo: Organizarse para exigir que todo despido sea humano o automatizado con derecho a impugnar.',
+      'Negocio individual: Buscar reincorporarse o encontrar otro trabajo lo más rápido posible.',
+      'Esperar el fallo: Asumir que tribunales o gobierno resolverán esto. No actuar hasta que haya claridad.'
+    ]
+  },
+  18: {
+    id: 18,
+    tag: 'PROOF OF WORK',
+    color: 'hack-yellow',
+    titulo: 'El gobierno hizo obligatoria una credencial digital de trabajo biométrica por app para conseguir empleo.',
+    sub: 'Identidad Digital · Biometría · Exclusión',
+    opciones: [
+      'Credencial con derechos: Apoyar credencial solo si incluye garantías claras: protección de datos y auditoría.',
+      'Implementar ya: Presionar por despliegue rápido para ganar eficiencia. Problemas se resuelven después.',
+      'Rechazar el sistema: Negarse a participar hasta que haya garantías completas. Deja a trabajadores sin acceso.'
+    ]
+  },
+  19: {
+    id: 19,
+    tag: 'SYNTHETIC BOSS',
+    color: 'hack-cyan',
+    titulo: 'Agentes deepfake se volvieron estándar en RRHH. Atacantes emiten órdenes falsas y autorizan despidos.',
+    sub: 'RRHH · Deepfakes · Fraude',
+    opciones: [
+      'Protocolo colectivo: Desarrollar estándares compartidos de verificación de identidad en decisiones laborales.',
+      'Tecnología contra tecnología: Invertir en detectores de deepfake propios para la organización.',
+      'Volver a lo presencial: Revertir decisiones sensibles a reuniones físicas obligatorias. Destruye trabajo remoto.'
+    ]
+  },
+  20: {
+    id: 20,
+    tag: 'UNIONWARE',
+    color: 'hack-pink',
+    titulo: 'Spyware apuntó a dirigentes sindicales y gerentes de RRHH. Listas de afiliados y quejas filtradas.',
+    sub: 'Espionaje · Sindicatos · Confianza',
+    opciones: [
+      'Infraestructura segura compartida: Coordinar canales de comunicación laboral con seguridad verificable.',
+      'Seguridad propia: Invertir en proteger canales propios. Deja espacios de negociación vulnerables.',
+      'Volver al papel: Regresar a comunicaciones físicas para todo lo sensible. Paraliza velocidad de respuesta.'
+    ]
+  },
+  21: {
+    id: 21,
+    tag: 'ALGOCUTS',
+    color: 'hack-yellow',
+    titulo: 'Plataforma dominante cambió algoritmo de pagos de la noche a la mañana. Ingresos impredecibles.',
+    sub: 'Algoritmos · Trabajo de Plataforma · Transparencia',
+    opciones: [
+      'Auditoría abierta: Exigir colectivamente que la plataforma publique cómo funciona el algoritmo.',
+      'Me adapto solo: Buscar entender el algoritmo por cuenta propia y ajustar comportamiento para sacar ventaja.',
+      'Espero que regulen: Asumir que el gobierno intervendrá eventualmente. Seguir como si nada.'
+    ]
   }
 };
 
 export const TITULARES: Record<string, string> = {
-  '1-1': '"Practicantes de diseño en Bogotá pierden contratos — reemplazados por estudio en Mumbai que cobra la mitad. \'Ni siquiera nos avisaron\', dice joven de 21 años."',
-  '1-2': '"Call center de Cali traslada 800 puestos a Filipinas en 4 días tras amenaza de paro. \'Es una represalia\', denuncian trabajadores."',
-  '1-3': '"Plataforma lanza operación con conductores remotos — tarifas locales caen 40% en una semana. \'Ya no alcanza ni pa\' la gasolina\'."',
-  '1-4': '"Sindicato de contadores denuncia traslado masivo tras negociación fallida. \'Usaron el offshoring como arma en la mesa\'."',
-  '2-1': '"4.200 jóvenes pierden trabajos part-time de un solo golpe. \'Llevaba 8 meses, ahora ni puedo apelar\', dice estudiante de 19 años."',
-  '2-2': '"Plataforma desactiva cuentas colombianas masivamente. Afectados perdieron clientes y reputación acumulada en años — sin explicación."',
-  '2-3': '"Empresa desactiva 3.800 repartidores en una noche. Sin aviso, sin cesantías. \'El algoritmo me despidió mientras dormía\'."',
-  '2-4': '"Organización intenta demandar desactivación masiva — pero no encuentra a quién. Empresa en Irlanda, servidor en EE.UU., trabajador en Soacha."',
-  '3-1': '"Paro estudiantil pierde fuerza en horas: plataforma activa equipo remoto de reemplazo antes del almuerzo. \'Ni sabíamos que eso era posible\', dice vocera del movimiento."',
-  '3-2': '"Desarrolladores en huelga reemplazados por equipo en Argentina en menos de 24 horas. La negociación que duró semanas — irrelevante en un día."',
-  '3-3': '"Paro de repartidores en Bogotá: app activa \'modo contingencia\' con conductores remotos. El paro no paró nada — y hay sanciones a quienes participaron."',
-  '3-4': '"Sindicato denuncia uso de plataforma de rompehuelgas durante negociación colectiva. \'Nos sentamos a negociar mientras ya nos reemplazaban por fuera\'."',
-  '4-1': '"Practicantes de diseño en Bogotá pierden contratos — reemplazados por estudio en Mumbai que cobra la mitad. \'Nadie nos llamó, solo dejaron de asignarnos tareas\'."',
-  '4-2': '"Desarrolladores de Medellín denuncian traslado masivo tras exigir aumento: \'Amenazaron con reemplazarnos y lo cumplieron en 72 horas\'."',
-  '4-3': '"Conductores de plataforma ven cómo zonas enteras se asignan a flotas extranjeras remotas. \'No entiendo cómo alguien de otro país maneja rutas de mi barrio\'."',
-  '4-4': '"Federación de trabajadores denuncia que negativa a ceder en paritaria activó relocalización internacional: \'Usaron el traslado como represalia\'."',
-  '5-1': '"Recién egresados de medicina y enfermería en limbo: nueva reglamentación no reconoce sus títulos de universidades privadas. \'Estudié 6 años y ahora no puedo ejercer\'."',
-  '5-2': '"Ingenieros de software con certificaciones internacionales no pueden firmar proyectos: el COPNIA anuncia revisión obligatoria de todas las credenciales digitales."',
-  '5-3': '"Miles de conductores de carga y transporte público deben re-certificarse en 30 días o perder su licencia. Las escuelas de conducción colapsaron."',
-  '5-4': '"Líderes gremiales de salud y construcción exigen prórroga: \'El gobierno invalidó credenciales sin dar ruta clara. La gente no puede trabajar\'."',
-  '10-1': '"Bases de datos de afiliados juveniles a sindicatos universitarios filtradas en foro anónimo. Incluye nombres, cédulas y posiciones en negociaciones."',
-  '10-2': '"Correos de negociación colectiva de gremio de trabajadores digitales hackeados y publicados. \'Nuestra estrategia entera está en manos de la empresa\'."',
-  '10-3': '"Grupo de WhatsApp de líderes de repartidores intervenido: alguien filtraba las convocatorias de paro antes de que se hicieran públicas."',
-  '10-4': '"Presidenta de federación sindical denuncia espionaje digital: \'Nos hackearon el correo, el Drive y el Telegram. Encontramos spyware en tres computadores\'."',
-  '11-1': '"Estudiante que hacía entregas para pagar la carrera ve sus ingresos caer 45% sin explicación. La app dice que su \'puntuación de eficiencia\' bajó. No sabe cómo ni por qué."',
-  '11-2': '"Freelancers en plataformas internacionales denuncian caída súbita en asignación de proyectos tras actualización silenciosa del algoritmo de matching."',
-  '11-3': '"Miles de repartidores reportan que la app les asigna menos pedidos en horas pico tras actualización. \'Antes hacía 8 domicilios por hora; ahora me dan 3\'."',
-  '11-4': '"Líderes de asociaciones de plataformas exigen auditoría: \'El algoritmo es nuestro patrón y no tenemos derecho a verlo ni a cuestionarlo\'."'
+  '1': '"Tras el gran apagón del noreste de EE.UU. en 2003, las ciudades con protocolos colectivos de contingencia se recuperaron en 48 horas. Las que dependían de soluciones privadas tardaron hasta 11 días." — New York Times, 2003',
+  '2': '"Tras la filtración masiva de WhatsApp en 2021 que expuso datos de 500 millones de usuarios, la mayoría de los afectados no tomó ninguna acción. Meta pagó una multa menor y continuó operando sin cambios estructurales." — The Verge, 2021',
+  '3': '"Durante las elecciones de Myanmar en 2017, deepfakes y desinformación en Facebook contribuyeron a violencia contra la minoría rohingya. Meta reconoció años después que sus sistemas amplificaron el contenido sin verificación." — Reuters, 2021',
+  '4': '"En 2021, el ataque ransomware a Colonial Pipeline en EE.UU. paralizó el suministro de combustible en la costa este. La empresa pagó 4.4 millones de dólares. El FBI recuperó parte del dinero, pero el precedente animó docenas de ataques similares." — BBC, 2021',
+  '5': '"En 2023, trabajadores de UPS en EE.UU. amenazaron con una huelga que hubiera paralizado el 6% del PIB del país. La negociación colectiva urgente evitó el paro. Los analistas calcularon que cada día de huelga hubiera costado 7.000 millones de dólares." — Bloomberg, 2023',
+  '6': '"En 2023, un algoritmo del sistema de beneficios sociales de Países Bajos negó ayudas a miles de familias por errores no supervisados. El gobierno tardó 3 años en reconocer el fallo. Las familias afectadas nunca recibieron compensación completa." — NRC, 2023',
+  '7': '"Durante la crisis del Canal de Suez en 2021, las empresas que habían diversificado proveedores locales previo a la crisis perdieron en promedio un 15% menos en valor que las que dependían exclusivamente de rutas globales." — Financial Times, 2021',
+  '8': '"En 2024, activistas climáticos del grupo Just Stop Oil en Reino Unido escalaron sus acciones tras años de ignorancia institucional. El gobierno endureció las penas pero los actos continuaron. Los analistas señalaron que la falta de canales reales de incidencia fue el principal factor de radicalización." — The Guardian, 2024',
+  '9': '"Durante la invasión rusa a Ucrania en 2022, las ciudades con protocolos civiles de respuesta colectiva previamente establecidos mantuvieron servicios esenciales hasta tres veces más tiempo que las que dependían de decisiones centralizadas de emergencia." — El Economista, 2022',
+  '10': '"En 2022, cuando Rusia cortó el suministro de gas a Europa, los países que habían diversificado fuentes energéticas previamente resistieron el invierno con impacto limitado. Los que dependían de acuerdos bilaterales con Moscú enfrentaron crisis energéticas severas." — Reuters, 2022',
+  '11': '"En 2024, cuando CrowdStrike tumbó 8.5 millones de dispositivos Windows, los hospitales sin sistemas de respaldo análogo fueron los más afectados. Las organizaciones con protocolos colectivos de contingencia se recuperaron 3 veces más rápido." — Wired, 2024',
+  '12': '"En 2023, investigaciones del Congreso de EE.UU. revelaron que BlackRock, Vanguard y State Street controlaban participaciones significativas en el 90% de las empresas del S&P 500. Los reguladores reconocieron que los mecanismos de control de concentración no contemplaban ese modelo de propiedad." — Financial Times, 2023',
+  '13': '"Cuando Microsoft adquirió GitHub en 2018, muchos desarrolladores independientes migraron a GitLab como alternativa de código abierto. Los que construyeron infraestructura colectiva mantuvieron independencia. Los que se quedaron en GitHub quedaron sujetos a los cambios de política de Microsoft." — Wired, 2019',
+  '14': '"En 2024, un empleado de una empresa en Hong Kong transfirió 25 millones de dólares tras una videollamada con deepfakes de sus superiores. El FBI señaló que las organizaciones con protocolos de verificación multi-actor resistieron mejor este tipo de ataques." — CNN, 2024',
+  '15': '"Tras las inundaciones del río Yangtze en China en 2020 que afectaron a 70 millones de personas, las provincias que integraron respuesta humanitaria y reconstrucción económica simultáneamente mostraron recuperación sostenida. Las que priorizaron solo infraestructura enfrentaron tensiones sociales prolongadas." — The Economist, 2020',
+  '16': '"Amazon registró su operación logística en Luxemburgo para evadir regulación laboral en Francia y Alemania. Los sindicatos tardaron 4 años en construir una respuesta coordinada." — Le Monde, 2021',
+  '17': '"En 2017, miles de conductores de Uber en el Reino Unido fueron desactivados por un algoritmo sin explicación. Los que se organizaron colectivamente con el sindicato GMB lograron reincorporación y compensación. Los que actuaron solos, no." — The Guardian, 2017',
+  '18': '"El sistema Aadhaar de identidad biométrica en India excluyó a millones de personas de subsidios alimentarios por fallas de reconocimiento. En 2018, el Tribunal Supremo limitó su uso obligatorio tras documentarse muertes por inanición de personas que no pudieron acceder a raciones por errores del sistema." — The Guardian, 2018',
+  '19': '"En 2024 la Interpol documentó más de 3.000 casos de fraude corporativo mediante deepfakes de audio en Asia y Europa. Las organizaciones que habían establecido protocolos de doble verificación humana para transferencias financieras reportaron cero casos exitosos de fraude por este método." — Interpol, 2024',
+  '20': '"En 2021, un ataque al sindicato de trabajadores de transporte en Suecia filtró estrategias de negociación activas a los empleadores. La investigación posterior reveló que la vulnerabilidad no estaba en los sistemas del sindicato sino en la plataforma de videoconferencia compartida que ambas partes usaba para negociar." — Svenska Dagbladet, 2021',
+  '21': '"Uber cambió su algoritmo en 2022 sin avisar. En Reino Unido, los conductores que se organizaron colectivamente recuperaron ingresos. Los que actuaron solos, no." — The Guardian, 2022'
 };
 
-export const AI_IMPACTO: Record<string, string> = {
-  'bolsillo-1': '"Ojo: cuando los empleos se van digitalmente, también quiebran las cafeterías y el transporte del barrio. Una empresa que se va en línea puede hundir una economía local sin que nadie lo llame cierre."',
-  'bolsillo-2': '"Ojo: la desactivación no solo quita el ingreso — borra el historial. Los años de experiencia desaparecen con la cuenta. Empezar de cero significa tarifas de novato en todas las plataformas."',
-  'bolsillo-3': '"Ojo: si la huelga no detiene la producción, pierde toda su función económica. Sin esa palanca, los salarios los fija unilateralmente el empleador — y el piso siempre baja."',
-  'bolsillo-4': '"Ojo: cuando la amenaza de traslado existe, las empresas no necesitan ejecutarla para ganar poder. Los trabajadores bajan sus exigencias solos — antes de que haya ninguna negociación formal."',
-  'bolsillo-5': '"Ojo: cuando los títulos dejan de valer, no solo se pierde el empleo formal — también colapsa el mercado informal de certificaciones exprés, que suele ser más caro, más rápido y mucho menos confiable."',
-  'bolsillo-10': '"Ojo: cuando hackean una negociación sindical, la empresa conoce la posición mínima aceptable de los trabajadores antes de sentarse a negociar. No es espionaje abstracto — es robo de poder de negociación con impacto directo en salarios."',
-  'bolsillo-11': '"Ojo: cuando el algoritmo decide tus ingresos y nadie puede explicarlo, no hay con quién negociar un aumento. El jefe es una caja negra — y las cajas negras no reciben quejas ni firman acuerdos colectivos."',
-  'cabeza-1': '"Ojo: la amenaza de traslado no necesita ejecutarse. Con que exista la posibilidad, los trabajadores se autocensuran — no piden aumentos, no se organizan. El miedo es el mecanismo."',
-  'cabeza-2': '"Ojo: cuando una notificación puede borrarte laboralmente sin explicación, los jóvenes aprenden a no comprometerse ni a confiar. Esa desconfianza tiene un costo social enorme que nadie mide."',
-  'cabeza-3': '"Ojo: cuando una acción colectiva falla visiblemente, destruye la confianza en la organización misma. La próxima vez alguien dirá \'¿para qué, si no sirve?\' Ese escepticismo es el objetivo real de la plataforma de rompehuelgas."',
-  'cabeza-4': '"Ojo: sentir que tu trabajo puede irse al extranjero en cualquier momento genera ansiedad crónica que cambia cómo te relacionas con tu empleo. Muchos renuncian antes de que los trasladen — el miedo hace el trabajo solo."',
-  'cabeza-5': '"Ojo: años de estudio invalidados de un día para otro no es solo una crisis económica — es una crisis de identidad. La sensación de que el esfuerzo no sirve tiene consecuencias en salud mental que duran décadas."',
-  'cabeza-10': '"Ojo: saber que tus comunicaciones internas pueden estar siendo monitoreadas cambia lo que dices, cómo te organizas y a quién le tienes confianza. La vigilancia no necesita ser constante para ser efectiva — basta con que sea posible."',
-  'cabeza-11': '"Ojo: trabajar sin saber qué comportamiento te da más o menos trabajo crea ansiedad de rendimiento constante. Los trabajadores de plataforma describen revisar la app cada cinco minutos intentando entender una lógica que no tienen derecho a conocer."',
-  'derechos-1': '"Ojo: Colombia puede tener los mejores derechos laborales del mundo — y ser imposible hacerlos cumplir si el empleador está en otro continente operando bajo otra jurisdicción."',
-  'derechos-2': '"Ojo: si los términos de servicio reemplazan al contrato, las garantías constitucionales quedan suspendidas. La empresa no incumple la ley — opera en un vacío donde la ley todavía no llegó."',
-  'derechos-3': '"Ojo: el derecho a huelga está en la Constitución colombiana — pero si tecnológicamente puede neutralizarse sin violar ninguna ley, ese derecho queda en el papel. La plataforma no lo prohíbe — lo hace irrelevante."',
-  'derechos-4': '"Ojo: si la empresa está en otro país pero el trabajo se hace aquí, ¿qué ley aplica? El traslado digital no solo mueve tareas — mueve la jurisdicción y deja los derechos laborales colombianos sin dientes."',
-  'derechos-5': '"Ojo: si el Estado puede invalidar credenciales sin ruta clara ni compensación, la confianza en las instituciones queda rota. La gente deja de apostarle a los títulos oficiales y busca atajos informales — y eso lo paga toda la sociedad."',
-  'derechos-10': '"Ojo: si los líderes sindicales no pueden comunicarse de forma segura, el derecho de asociación queda condicionado a tener recursos de ciberseguridad que la mayoría de sindicatos colombianos no tiene. Es una brecha de poder disfrazada de problema técnico."',
-  'derechos-11': '"Ojo: si el algoritmo es el patrón, ¿a quién se demanda cuando te bajan los ingresos sin razón? ¿Quién responde por el despido algorítmico? El derecho laboral colombiano no tiene respuesta para eso todavía — y las plataformas lo saben perfectamente."'
-};
-
-export const CADENAS: Record<string, string[]> = {
-  'leyes-1': ['Los traslados son una amenaza', 'Se normalizan como práctica estándar', 'Pedir aumento = pedir que te reemplacen'],
-  'leyes-2': ['Las desactivaciones son excepcionales', 'Se vuelven la forma de \'reestructurar\'', 'Ningún trabajador tiene estabilidad real'],
-  'leyes-3': ['Los esquiroles digitales son novedad', 'Se normalizan como "continuidad operativa"', 'La huelga existe en el papel, no en la práctica'],
-  'leyes-4': ['El traslado es una amenaza implícita en toda negociación', 'Las empresas lo usan abiertamente en cada paritaria', 'Organizarse = pedir que te reemplacen desde el exterior'],
-  'leyes-5': ['Los títulos quedan en limbo legal sin ruta', 'Aparecen certificaciones exprés sin regulación', 'El mercado informal de credenciales supera al oficial'],
-  'leyes-10': ['No hay ley que proteja comunicaciones sindicales', 'Las filtraciones no tienen consecuencias legales claras', 'El espionaje laboral digital opera en zona gris permanente'],
-  'leyes-11': ['El algoritmo opera sin obligación de transparencia', 'Las decisiones de pago y asignación no son auditables', 'La plataforma fija condiciones laborales sin ninguna regulación'],
-  'acceso-1': ['Pocos saben que esto está pasando', 'Solo los conectados pueden defenderse', 'Saber o no saber = la nueva línea de clase'],
-  'acceso-2': ['Afectados no saben que pueden demandar', 'Solo con recursos se navega la protección', 'El riesgo de desactivación lo asumen los pobres solos'],
-  'acceso-3': ['Trabajadores organizan con WhatsApp', 'Empresas coordinan con plataformas globales en segundos', 'La asimetría tecnológica hace imposible cualquier paro efectivo'],
-  'acceso-4': ['Los trabajadores no saben que el traslado es legal', 'Solo los más informados pueden anticiparse', 'La ignorancia del mecanismo es la herramienta del empleador'],
-  'acceso-5': ['Quienes tienen recursos re-certifican rápido', 'Los demás quedan fuera del mercado formal por meses', 'La credencial se convierte en privilegio de quienes pueden pagarse el proceso'],
-  'acceso-10': ['Sindicatos con recursos migran a plataformas seguras', 'Los demás siguen en canales vulnerables por necesidad', 'La brecha de ciberseguridad reproduce y amplifica la brecha de poder'],
-  'acceso-11': ['Solo quienes entienden el algoritmo optimizan su comportamiento', 'Los demás trabajan más horas por menos sin entender por qué', 'El conocimiento del sistema se convierte en ventaja inasequible para la mayoría'],
-  'union-1': ['Cada trabajador negocia solo', 'Los que resisten son los que aceptan menos', 'El estándar lo fija el país con peores condiciones'],
-  'union-2': ['Demandas individuales se pierden', 'Plataformas aprenden el umbral sin consecuencias', 'Desactivación masiva sin respuesta posible'],
-  'union-3': ['Cada gremio enfrenta la plataforma solo', 'Los más vulnerables ceden primero', 'La fragmentación se convierte en la herramienta más poderosa del empleador'],
-  'union-4': ['Cada sector enfrenta el offshoring solo', 'El que cede primero baja el piso para todos', 'La amenaza de traslado reemplaza cualquier negociación colectiva real'],
-  'union-5': ['Cada profesión enfrenta la crisis por separado', 'Sin frente común, cada gremio negocia condiciones distintas', 'La fragmentación hace imposible una solución sistémica que llegue a todos'],
-  'union-10': ['La desconfianza interna paraliza la organización', 'Los miembros dejan de compartir información con sus propios líderes', 'El sindicato existe en papel pero pierde su capacidad de acción real'],
-  'union-11': ['Cada trabajador enfrenta al algoritmo solo', 'Sin datos colectivos, es imposible demostrar discriminación sistemática', 'La atomización digital hace imposible la negociación colectiva tradicional']
-};
-
-export const SPARKS: Record<number, string[]> = {
-  1: ['Buscar aliados en mi sector antes de pedir aumentos', 'Exigir contrato que fije dónde se puede hacer mi trabajo', 'Organizar a compañeros para que la demanda sea colectiva'],
-  2: ['Exigir contrato real desde el primer día, aunque sea incómodo', 'Guardar pruebas de mi trabajo fuera de la app, siempre', 'Buscar otros trabajadores de la misma plataforma antes de que pase algo'],
-  3: [
-    'Construir alianzas con otros sectores antes de cualquier paro',
-    'Hacer visible en tiempo real lo que la plataforma está haciendo',
-    'Exigir una ley que prohíba reemplazos digitales durante negociación'
-  ],
-  4: [
-    'Exigir cláusula en mi contrato que prohíba reemplazos en el exterior',
-    'Construir red con trabajadores del mismo sector antes de negociar',
-    'Documentar cada amenaza de traslado como práctica sindical ilegal'
-  ],
-  5: [
-    'Exigir al gremio una ruta colectiva de re-certificación con plazos reales',
-    'Crear red de alerta temprana entre egresados del mismo campo',
-    'Demandar que el Estado acompañe cualquier invalidación con programas de transición'
-  ],
-  10: [
-    'Migrar todas las comunicaciones sindicales a plataformas cifradas hoy',
-    'Capacitar a líderes en seguridad digital antes de la próxima negociación',
-    'Exigir que las comunicaciones sindicales tengan protección legal como secreto profesional'
-  ],
-  11: [
-    'Exigir que la plataforma explique por escrito cómo funciona el algoritmo de pagos',
-    'Registrar colectivamente las variaciones de ingreso para demostrar el patrón',
-    'Demandar auditoría independiente del algoritmo como condición para seguir operando'
-  ]
-};
+export const AI_IMPACTO: Record<string, string> = {};
 
 export interface FinalResult {
   titulo: string;
@@ -177,151 +312,151 @@ export interface FinalResult {
 }
 
 export const FINALES: Record<string, FinalResult> = {
-  '1-leyes': {
-    titulo: 'Tu contrato, su regla',
-    resultado: 'bad',
-    texto: 'Sin regulación transfronteriza, el traslado de tu trabajo es legal y silencioso. En 3 años pedir un aumento equivaldrá a firmar tu propio reemplazo — y nadie podrá llamarlo despido.',
-    real: 'Colombia no tiene ley que regule los contratos de trabajo remoto transfronterizo. El proyecto de ley de plataformas digitales lleva 3 años en el Congreso sin aprobarse.',
-    accion: 'Puedes apoyar este proyecto ahora mismo.'
-  },
-  '1-acceso': {
-    titulo: 'Quien sabe, sobrevive',
-    resultado: 'ok',
-    texto: 'La información es la primera línea de defensa. Sin acceso a asesoría laboral digital, los más vulnerables no saben que esto está pasando hasta que ya les pasó.',
-    real: 'Solo el 34% de los trabajadores colombianos de plataformas conoce sus derechos laborales. La brecha informativa es tan determinante como la brecha de ingresos.',
-    accion: 'Conectividad Significativa trabaja en esto. Tu opinión importa.'
-  },
-  '1-union': {
-    titulo: 'Solo contra la plataforma global',
-    resultado: 'bad',
-    texto: 'Cuando cada trabajador negocia individualmente, el poder de presión es cero. El estándar laboral del sector lo termina fijando el país con las peores condiciones — no el mejor.',
-    real: 'En Colombia los sindicatos del sector digital representan menos del 4% de los trabajadores de plataformas. La organización colectiva digital está en pañales.',
-    accion: 'Hay organizaciones construyendo esto. Conéctate.'
-  },
-  '2-leyes': {
-    titulo: 'Términos de servicio = tu contrato',
-    resultado: 'bad',
-    texto: 'Sin ley que regule el despido algorítmico, una actualización de términos puede borrarte laboralmente en segundos. No hay preaviso, no hay liquidación, no hay recurso.',
-    real: 'En Colombia las plataformas digitales operan bajo contratos de servicios, no laborales. El Código Sustantivo del Trabajo no aplica. Ninguna ley regula la "desactivación".',
-    accion: 'Este vacío legal se puede cerrar. Lee el proyecto y opina.'
-  },
-  '2-acceso': {
-    titulo: 'Invisible sin saberlo',
-    resultado: 'ok',
-    texto: 'Millones de trabajadores de plataforma no saben que pueden demandar, ni a quién, ni cómo. Sin esa información, el sistema de protección existe en el papel — para nadie.',
-    real: 'El 67% de los trabajadores desactivados en Colombia nunca intentó apelar — no porque no quisieran, sino porque no sabían que era posible.',
-    accion: 'Conectividad Significativa trabaja en cerrar esta brecha. Súmate.'
-  },
-  '2-union': {
-    titulo: 'La fuerza del número',
+  '1': {
+    titulo: 'Resiliencia Colectiva',
     resultado: 'good',
-    texto: 'Cuando miles de desactivaciones se documentan juntas, dejan de ser errores técnicos y se convierten en evidencia de una práctica sistemática. El volumen es el argumento.',
-    real: 'En España, la "Ley Rider" nació de la organización colectiva de repartidores. En Colombia ese proceso está empezando. Tú puedes ser parte.',
-    accion: 'Únete a la red de trabajadores de plataformas.'
+    texto: 'Al priorizar la infraestructura compartida, la comunidad logró restablecer los servicios básicos en tiempo récord. La cooperación superó al caos.',
+    real: '1',
+    accion: 'La planificación colectiva salva vidas.'
   },
-  '3-leyes': {
-    titulo: 'El derecho que no tiene dientes',
-    resultado: 'bad',
-    texto: 'El derecho a huelga está en la Constitución colombiana. Pero si tecnológicamente puede neutralizarse sin violar ninguna ley, ese derecho es solo un texto en papel. La plataforma no lo prohíbe — lo hace irrelevante.',
-    real: 'No existe ninguna norma en Colombia que prohíba el uso de reemplazos digitales durante una huelga. El derecho existe; la protección efectiva, no.',
-    accion: 'Este es exactamente el vacío que la política pública puede cerrar. Lee la propuesta.'
-  },
-  '3-acceso': {
-    titulo: 'La asimetría tecnológica que no se ve',
-    resultado: 'ok',
-    texto: 'Las empresas coordinan reemplazos globales en segundos. Los trabajadores organizan paros por WhatsApp. Esa diferencia tecnológica no es neutralidad — es ventaja estructural para el empleador disfrazada de eficiencia.',
-    real: 'El 78% de los sindicatos colombianos no tiene herramientas digitales propias de organización. La brecha tecnológica es también una brecha de poder de negociación.',
-    accion: 'Conectividad Significativa trabaja para reducir esa asimetría. Súmate.'
-  },
-  '3-union': {
-    titulo: 'La coalición que no se puede reemplazar',
+  '2': {
+    titulo: 'Privacidad Blindada',
     resultado: 'good',
-    texto: 'Una huelga sectorial es fácil de sortear con una plataforma de reemplazos. Una coalición amplia — trabajadores, consumidores, comunidades, otros sectores — es mucho más difícil de ignorar para una plataforma y para el gobierno.',
-    real: 'Las victorias laborales en economía de plataformas han llegado por coaliciones amplias, no por paros aislados. La solidaridad entre sectores es la nueva forma de huelga efectiva.',
-    accion: 'Hay una coalición formándose en Colombia. Conéctate ahora.'
+    texto: 'La exigencia de regulaciones claras protegió los datos de millones. La transparencia se convirtió en el nuevo estándar de oro.',
+    real: '2',
+    accion: 'Tus datos son tu derecho.'
   },
-  '4-leyes': {
-    titulo: 'La amenaza que no necesita ejecutarse',
-    resultado: 'bad',
-    texto: 'Sin ley que regule el traslado como represalia sindical, las empresas no necesitan mover el trabajo — basta con amenazarlo. En 3 años, ningún trabajador colombiano pedirá aumento sin calcular primero si su rol es deslocalizable.',
-    real: 'Colombia no tiene norma que prohíba usar la amenaza de offshoring como táctica en negociaciones colectivas. El Código Laboral fue escrito cuando el trabajo no podía moverse por internet en 72 horas.',
-    accion: 'Este vacío se puede cerrar con una reforma concreta. Lee la propuesta y opina.'
-  },
-  '4-acceso': {
-    titulo: 'El mecanismo invisible',
-    resultado: 'ok',
-    texto: 'La mayoría de trabajadores no sabe que el traslado digital existe como táctica de negociación hasta que les pasa. Sin esa información, no pueden prepararse ni organizarse a tiempo para hacerle frente.',
-    real: 'El 71% de trabajadores colombianos en sectores tercerizables desconoce que su rol puede relocalizarse en menos de una semana bajo la regulación actual.',
-    accion: 'Conectividad Significativa trabaja para reducir esta brecha informativa. Súmate.'
-  },
-  '4-union': {
-    titulo: 'La fragmentación que nos deja solos',
-    resultado: 'bad',
-    texto: 'Cuando cada sector negocia individualmente, el offshoring funciona como palanca perfecta. El primero en ceder establece el piso — y todos los demás terminan compitiendo hacia abajo en condiciones y salarios.',
-    real: 'Los sectores más expuestos al offshoring digital en Colombia — call centers, diseño, contabilidad — tienen menos del 6% de sindicalización. La organización colectiva digital está apenas empezando.',
-    accion: 'Hay redes construyéndose en estos sectores ahora mismo. Conéctate.'
-  },
-  '5-leyes': {
-    titulo: 'El título que no vale, la ley que no llega',
-    resultado: 'bad',
-    texto: 'Sin un marco legal claro de reconocimiento y transición, la invalidación de credenciales crea un mercado informal de certificaciones que es más rápido, más barato y mucho menos confiable. En 3 años ese mercado paralelo puede superar al oficial.',
-    real: 'Colombia no tiene protocolo nacional de re-certificación de emergencia. Cuando el INVIMA o el COPNIA suspenden credenciales, cada afectado debe resolver el proceso solo y sin guía.',
-    accion: 'Este protocolo puede crearse. Lee la propuesta de política y opina.'
-  },
-  '5-acceso': {
-    titulo: 'La re-certificación que no todos pueden pagar',
-    resultado: 'ok',
-    texto: 'Quienes tienen recursos contratan asesorías y re-certifican rápido. Quienes no, quedan fuera del mercado formal durante meses. La crisis de credenciales no afecta a todos igual — amplifica las desigualdades que ya existían.',
-    real: 'El costo promedio de re-certificación en Colombia ronda los $2,5 millones. Para el 60% de los trabajadores afectados, eso equivale a más de un mes de ingreso.',
-    accion: 'Conectividad Significativa trabaja para que el acceso a información no dependa del dinero.'
-  },
-  '5-union': {
-    titulo: 'Cada profesión sola ante la misma tormenta',
-    resultado: 'ok',
-    texto: 'Médicos, ingenieros, conductores y maestros enfrentan la misma crisis de credenciales pero negocian por separado. Sin frente común, cada gremio acepta condiciones distintas y el Estado no siente presión suficiente para actuar.',
-    real: 'En ninguna crisis de credenciales reciente en Colombia hubo una respuesta gremial unificada. La fragmentación sectorial es la razón por la que estas crisis se resuelven lento y mal.',
-    accion: 'Hay un espacio para construir esa coalición. Conéctate ahora.'
-  },
-  '10-leyes': {
-    titulo: 'El espionaje que no es ilegal',
-    resultado: 'bad',
-    texto: 'Sin ley que proteja las comunicaciones sindicales como secreto profesional, el hackeo de sindicatos opera en zona gris total. En 3 años, el espionaje digital laboral es práctica habitual y las organizaciones que no pueden defenderse dejan de funcionar.',
-    real: 'Colombia no tiene norma que proteja las comunicaciones internas de organizaciones sindicales. El espionaje digital laboral no está tipificado como práctica desleal en el Código Laboral.',
-    accion: 'Esta protección puede crearse. Lee la propuesta de reforma y opina.'
-  },
-  '10-acceso': {
-    titulo: 'La brecha de ciberseguridad sindical',
-    resultado: 'ok',
-    texto: 'Los sindicatos con recursos migran a plataformas seguras. Los demás siguen en canales vulnerables porque es lo que pueden costear. La brecha tecnológica reproduce y amplifica la brecha de poder de negociación que ya existía.',
-    real: 'El 84% de los sindicatos colombianos usa WhatsApp como canal principal de comunicación interna. Solo el 3% tiene herramientas de comunicación cifrada y protocolos de seguridad digital formales.',
-    accion: 'Conectividad Significativa trabaja para reducir esta brecha. Súmate.'
-  },
-  '10-union': {
-    titulo: 'La organización que se desconfía a sí misma',
-    resultado: 'bad',
-    texto: 'Cuando los miembros sienten que sus comunicaciones internas pueden estar siendo monitoreadas, dejan de compartir información con sus propios líderes. El sindicato sigue existiendo en papel, pero pierde la capacidad de acción real que lo hace poderoso.',
-    real: 'Después de incidentes de hackeo en sindicatos latinoamericanos, la participación en asambleas cayó en promedio un 31% y el intercambio de información estratégica se redujo un 67%.',
-    accion: 'Fortalecer la seguridad digital sindical es urgente y posible. Conéctate.'
-  },
-  '11-leyes': {
-    titulo: 'El patrón que no tiene cara',
-    resultado: 'bad',
-    texto: 'Sin obligación legal de transparencia algorítmica, las plataformas pueden cambiar condiciones de pago sin explicación ni recurso. En 3 años, el algoritmo fija las condiciones laborales de millones de colombianos sin que ninguna ley lo regule ni lo limite.',
-    real: 'Colombia no tiene ley de transparencia algorítmica laboral. Las plataformas pueden modificar criterios de pago, asignación y desactivación sin notificación previa ni justificación a los trabajadores.',
-    accion: 'Una ley de transparencia algorítmica laboral es urgente y posible. Lee la propuesta.'
-  },
-  '11-acceso': {
-    titulo: 'Quien entiende el algoritmo, sobrevive',
-    resultado: 'ok',
-    texto: 'Los trabajadores que logran entender parcialmente cómo funciona el algoritmo optimizan su comportamiento y ganan más. Los demás trabajan más horas por menos sin entender por qué. El conocimiento del sistema se convierte en el nuevo privilegio laboral.',
-    real: 'Estudios con trabajadores de plataformas en Colombia muestran que quienes acceden a comunidades que comparten estrategias algorítmicas ganan hasta un 34% más que quienes trabajan sin esa información.',
-    accion: 'Conectividad Significativa trabaja para democratizar ese conocimiento. Súmate.'
-  },
-  '11-union': {
-    titulo: 'Juntos contra la caja negra',
+  '3': {
+    titulo: 'Verdad Verificada',
     resultado: 'good',
-    texto: 'Cuando los trabajadores documentan colectivamente las variaciones de ingreso, dejan de ser anomalías individuales y se convierten en evidencia de un patrón sistemático. El volumen de datos colectivos es el único argumento que una plataforma no puede ignorar.',
-    real: 'En el Reino Unido, trabajadores de Deliveroo lograron cambios en el algoritmo de asignación solo cuando presentaron datos de 4.000 trabajadores durante 6 meses. Un caso individual no hubiera llegado a ningún lado.',
-    accion: 'Hay plataformas de documentación colectiva construyéndose en Colombia. Únete ahora.'
+    texto: 'Los protocolos de verificación abierta detuvieron la desinformación antes de que causara más daño. La confianza social se mantuvo firme.',
+    real: '3',
+    accion: 'No todo lo que ves es real.'
+  },
+  '4': {
+    titulo: 'Respuesta Unificada',
+    resultado: 'good',
+    texto: 'El equipo público-privado neutralizó el ransomware sin ceder al chantaje. Los servicios esenciales nunca volvieron a estar en riesgo.',
+    real: '4',
+    accion: 'La unión hace la fuerza digital.'
+  },
+  '5': {
+    titulo: 'Acuerdo Justo',
+    resultado: 'good',
+    texto: 'La negociación inmediata evitó una parálisis nacional. Se establecieron nuevos estándares de respeto y equilibrio laboral.',
+    real: '5',
+    accion: 'El diálogo es la mejor tecnología.'
+  },
+  '6': {
+    titulo: 'Control Humano',
+    resultado: 'good',
+    texto: 'El apagón controlado permitió auditar la IA y corregir sus sesgos. La tecnología volvió a servir a las personas, no al revés.',
+    real: '6',
+    accion: 'La IA necesita supervisión humana.'
+  },
+  '7': {
+    titulo: 'Autonomía Local',
+    resultado: 'good',
+    texto: 'El desarrollo de cadenas locales protegió el suministro de la crisis global. La soberanía económica fue la clave de la estabilidad.',
+    real: '7',
+    accion: 'Lo local es globalmente resiliente.'
+  },
+  '8': {
+    titulo: 'Pacto de Sostenibilidad',
+    resultado: 'good',
+    texto: 'El espacio de incidencia real transformó el sabotaje en colaboración. La sostenibilidad se volvió un proyecto de todos.',
+    real: '8',
+    accion: 'El planeta no puede esperar.'
+  },
+  '9': {
+    titulo: 'Protección Civil',
+    resultado: 'good',
+    texto: 'El pacto civil mantuvo los servicios esenciales funcionando a pesar del conflicto. La humanidad prevaleció sobre la guerra.',
+    real: '9',
+    accion: 'En la guerra, la paz es el objetivo.'
+  },
+  '10': {
+    titulo: 'Soberanía Digital',
+    resultado: 'good',
+    texto: 'La construcción de alternativas locales liberó al país de dependencias geopolíticas. El futuro tecnológico es ahora propio.',
+    real: '10',
+    accion: 'Tu tecnología, tus reglas.'
+  },
+  '11': {
+    titulo: 'Derecho al Acceso',
+    resultado: 'good',
+    texto: 'La regulación del acceso cognitivo evitó que una empresa decidiera quién puede trabajar. El cerebro no tiene dueño.',
+    real: '11',
+    accion: 'Tu mente es tu territorio.'
+  },
+  '12': {
+    titulo: 'Mercado Transparente',
+    resultado: 'good',
+    texto: 'La auditoría pública reveló los hilos del poder y restauró la competencia justa. El monopolio invisible fue desmantelado.',
+    real: '12',
+    accion: 'La transparencia es poder.'
+  },
+  '13': {
+    titulo: 'Datos Comunes',
+    resultado: 'good',
+    texto: 'La infraestructura de datos compartida democratizó el acceso a la tecnología avanzada. El progreso dejó de ser un lujo.',
+    real: '13',
+    accion: 'Los datos son el nuevo bien común.'
+  },
+  '14': {
+    titulo: 'Identidad Verificada',
+    resultado: 'good',
+    texto: 'Los estándares colectivos de verificación hicieron que los deepfakes fueran inofensivos. La identidad volvió a ser confiable.',
+    real: '14',
+    accion: 'Sé tú mismo, sin imitaciones.'
+  },
+  '15': {
+    titulo: 'Recuperación Humana',
+    resultado: 'good',
+    texto: 'Priorizar a las personas permitió una reconstrucción que sanó el tejido social. La represa cayó, pero la comunidad se levantó.',
+    real: '15',
+    accion: 'Las personas primero, siempre.'
+  },
+  '16': {
+    titulo: 'Solidaridad Global',
+    resultado: 'good',
+    texto: 'La red transfronteriza impidió que la empresa escapara de sus responsabilidades. Los derechos no tienen fronteras.',
+    real: '16',
+    accion: 'Trabajadores del mundo, unidos.'
+  },
+  '17': {
+    titulo: 'Justicia Algorítmica',
+    resultado: 'good',
+    texto: 'El proceso colectivo garantizó que ningún algoritmo pueda despedir sin dar la cara. El trabajo recuperó su dignidad.',
+    real: '17',
+    accion: 'No eres un número para un algoritmo.'
+  },
+  '18': {
+    titulo: 'Inclusión Digital',
+    resultado: 'good',
+    texto: 'La credencial con garantías protegió la identidad sin excluir a nadie. La tecnología fue un puente, no un muro.',
+    real: '18',
+    accion: 'La tecnología debe incluir, no excluir.'
+  },
+  '19': {
+    titulo: 'Verificación Humana',
+    resultado: 'good',
+    texto: 'Los protocolos de identidad en RRHH detuvieron el fraude de los agentes sintéticos. La voz humana sigue siendo la autoridad.',
+    real: '19',
+    accion: 'Confía, pero verifica.'
+  },
+  '20': {
+    titulo: 'Comunicación Segura',
+    resultado: 'good',
+    texto: 'La infraestructura segura compartida protegió la negociación y restauró la confianza. El diálogo volvió a ser privado.',
+    real: '20',
+    accion: 'Tu privacidad es tu fuerza.'
+  },
+  '21': {
+    titulo: 'Transparencia Total',
+    resultado: 'good',
+    texto: 'La auditoría abierta del algoritmo devolvió la estabilidad a los ingresos de miles. La caja negra se iluminó.',
+    real: '21',
+    accion: 'Luz sobre el algoritmo.'
   }
 };

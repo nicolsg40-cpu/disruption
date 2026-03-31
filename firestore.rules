@@ -1,66 +1,57 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    
     // ===============================================================
     // Assumed Data Model
     // ===============================================================
     //
-    // Collection: interactions
+    // Collection: sessions
     // Document ID: auto-generated
     // Fields:
-    //   - disruptionId: number (required)
-    //   - roleId: number (required)
-    //   - impactId: string (required)
-    //   - restrictionId: string (required)
-    //   - actionText: string (required, max 1000 chars)
-    //   - timestamp: timestamp (required)
-    //   - userId: string (optional)
+    //   - status: string (waiting, selecting_shock, playing, revealing, finished)
+    //   - shockId: number (optional)
+    //   - players: map (uid -> { roleId, choice, name, isReady })
+    //   - score: number (optional)
+    //   - createdAt: timestamp
     //
     // ===============================================================
 
-    // ===============================================================
     // Helper Functions
-    // ===============================================================
-    
     function isAuthenticated() {
       return request.auth != null;
     }
 
-    function isValidInteraction(data) {
-      return data.disruptionId is number &&
-             data.roleId is number &&
-             data.impactId is string &&
-             data.restrictionId is string &&
-             data.actionText is string && data.actionText.size() <= 1000 &&
-             data.timestamp is timestamp;
+    function isPlayerInSession(sessionId) {
+      return isAuthenticated() && (request.auth.uid in get(/databases/$(database)/documents/sessions/$(sessionId)).data.players);
     }
 
-    function isAdmin() {
-      return isAuthenticated() &&
-        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
-          (request.auth.token.email == "nicolsg40@gmail.com" && request.auth.token.email_verified == true));
+    function isValidSession(data) {
+      return data.status in ['waiting', 'selecting_shock', 'playing', 'revealing', 'finished'] &&
+             data.players is map &&
+             data.createdAt is timestamp;
     }
 
-    // ===============================================================
-    // Rules
-    // ===============================================================
-
-    match /interactions/{interactionId} {
-      // Anyone can create an interaction (to allow anonymous participation)
-      // But we validate the data strictly
-      allow create: if isValidInteraction(request.resource.data);
+    match /sessions/{sessionId} {
+      // Allow any authenticated user to read sessions (to join)
+      allow read: if isAuthenticated();
       
-      // Only admins can read the full list of interactions
-      allow read: if isAdmin();
-      
-      // No updates or deletes allowed for now to preserve integrity
-      allow update, delete: if false;
+      // Allow creation of a new session
+      allow create: if isAuthenticated() && 
+                    isValidSession(request.resource.data) &&
+                    request.resource.data.players.keys().size() == 1 &&
+                    request.resource.data.players.keys().hasAll([request.auth.uid]);
+
+      // Allow updates if the user is a player in the session
+      // For simplicity in this prototype, we allow the update if they are a player
+      // and the session structure remains valid.
+      allow update: if isAuthenticated() && 
+                    isValidSession(request.resource.data) &&
+                    (request.auth.uid in resource.data.players || request.resource.data.players.keys().size() <= 3);
     }
 
-    match /users/{userId} {
-      allow read: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
-      allow write: if isAdmin();
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }

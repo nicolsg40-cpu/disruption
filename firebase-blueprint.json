@@ -1,25 +1,51 @@
 {
   "entities": {
-    "Interaction": {
-      "title": "User Interaction",
-      "description": "A record of a user's choices and final action in the Hackea la Disrupción experience.",
+    "PlayerState": {
+      "title": "Player State",
+      "description": "State of an individual player in a session.",
       "type": "object",
       "properties": {
-        "disruptionId": { "type": "integer", "description": "ID of the chosen disruption" },
-        "roleId": { "type": "integer", "description": "ID of the chosen role" },
-        "impactId": { "type": "string", "description": "ID of the chosen impact area" },
-        "restrictionId": { "type": "string", "description": "ID of the chosen restriction" },
-        "actionText": { "type": "string", "description": "The user's final action text" },
-        "timestamp": { "type": "string", "format": "date-time", "description": "When the interaction occurred" },
-        "userId": { "type": "string", "description": "Optional user ID if authenticated" }
+        "roleId": { "type": "string", "description": "Assigned role ID." },
+        "choice": { "type": "integer", "description": "The option index chosen (0, 1, 2)." },
+        "name": { "type": "string", "description": "Player display name." },
+        "isReady": { "type": "boolean", "description": "Whether the player is ready for the next stage." }
+      }
+    },
+    "Session": {
+      "title": "Game Session",
+      "description": "A multiplayer game session for 3 players.",
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["waiting", "selecting_shock", "playing", "revealing", "finished"],
+          "description": "Current status of the session."
+        },
+        "shockId": {
+          "type": "integer",
+          "description": "The ID of the chosen shock."
+        },
+        "players": {
+          "type": "object",
+          "description": "Map of player UIDs to their PlayerState."
+        },
+        "score": {
+          "type": "integer",
+          "description": "Collective resilience score."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the session was created."
+        }
       },
-      "required": ["disruptionId", "roleId", "impactId", "restrictionId", "actionText", "timestamp"]
+      "required": ["status", "players", "createdAt"]
     }
   },
   "firestore": {
-    "/interactions/{interactionId}": {
-      "schema": "Interaction",
-      "description": "Collection of all user interactions"
+    "/sessions/{sessionId}": {
+      "schema": "Session",
+      "description": "Active game sessions."
     }
   }
 }
