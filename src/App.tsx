@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-console.log("App.tsx: module load");
+console.log("App.tsx: module load - grayscale update");
 import { useState, useEffect, useRef } from "react";
 import { 
   DISRUPCIONES, 
