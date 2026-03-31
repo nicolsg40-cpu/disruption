@@ -150,7 +150,7 @@ export default function App() {
   const currentDisruption = state.disruptionId ? DISRUPCIONES[state.disruptionId] : null;
 
   return (
-    <div className="min-h-screen bg-yellow-color flex justify-center items-start overflow-x-hidden">
+    <div className="min-h-screen bg-gray-100 flex justify-center items-start overflow-x-hidden font-['Advent_Pro']">
       {/* Background Audio */}
       <audio 
         ref={audioRef}
@@ -162,26 +162,26 @@ export default function App() {
       {/* Mute Toggle */}
       <button 
         onClick={toggleMute}
-        className="fixed top-4 right-4 z-50 p-2.5 rounded-full bg-black/40 backdrop-blur-md border border-white/10 text-white/70 hover:text-white hover:bg-black/60 transition-all active:scale-95 shadow-lg"
+        className="fixed top-4 right-4 z-50 p-2.5 rounded-full bg-black/10 backdrop-blur-md border border-black/10 text-black/70 hover:text-black hover:bg-black/20 transition-all active:scale-95 shadow-lg"
         title={isMuted ? "Activar sonido" : "Silenciar"}
       >
         {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
       </button>
 
-      <div className="w-full max-w-[420px] min-h-screen flex flex-col relative bg-yellow-color border-x border-black/10">
+      <div className="w-full max-w-[420px] min-h-screen flex flex-col relative bg-white border-x border-gray-200">
         
         {/* Welcome Screen */}
         <ScreenWrapper isVisible={screen === "welcome"}>
           <div className="flex-1 flex flex-col justify-center">
-            <span className="text-[10px] text-red-color tracking-[0.2em] uppercase font-semibold mb-4">
+            <span className="text-[10px] text-gray-500 tracking-[0.2em] uppercase font-semibold mb-4">
               Conectividad Significativa
             </span>
-            <h1 className="text-4xl font-bold leading-tight mb-6 cyberpunk glitched">
+            <h1 className="text-4xl font-bold leading-tight mb-6 cyberpunk">
               Hackea la<br />Disrupción
             </h1>
             <p className="cyberpunk leading-relaxed mb-8">
               El futuro del trabajo ya llegó — y no pidió permiso.<br /><br />
-              En <span className="text-red-color font-bold">5 minutos</span> vas a elegir una crisis real, sentirla desde adentro y pensar qué harías tú para enfrentarla.
+              En <span className="text-black font-bold">5 minutos</span> vas a elegir una crisis real, sentirla desde adentro y pensar qué harías tú para enfrentarla.
             </p>
             <div className="p-4 mb-8">
               <p className="cyberpunk inverse text-sm">
@@ -197,7 +197,7 @@ export default function App() {
         {/* Disruption Selection */}
         <ScreenWrapper isVisible={screen === "disruption"}>
           <ProgressBar step={1} totalSteps={6} label="Paso 1 de 6 · Elige tu disrupción" />
-          <h2 className="text-2xl font-bold mb-2 cyberpunk glitched">¿Qué crisis te preocupa más?</h2>
+          <h2 className="text-2xl font-bold mb-2 cyberpunk">¿Qué crisis te preocupa más?</h2>
           <p className="cyberpunk inverse text-sm mb-6">Cada disrupción abre un camino diferente. Elige la que más te toca.</p>
           
           <div className="space-y-3 mb-8">
@@ -208,15 +208,15 @@ export default function App() {
                   setState(prev => ({ ...prev, disruptionId: d.id }));
                   setScreen("role");
                 }}
-                className="w-full p-5 text-left border-2 border-yellow-color/20 bg-black hover:border-red-color hover:bg-red-color/5 transition-all group relative overflow-hidden"
+                className="w-full p-5 text-left border-2 border-gray-200 bg-white hover:border-black hover:bg-gray-50 transition-all group relative overflow-hidden"
               >
-                <span className="block text-[10px] text-red-color uppercase tracking-widest font-bold mb-1">
+                <span className="block text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">
                   {d.tag}
                 </span>
-                <span className="block text-sm font-semibold text-yellow-color mb-1 group-hover:text-red-color transition-colors">
+                <span className="block text-sm font-semibold text-black mb-1 group-hover:text-gray-700 transition-colors">
                   {d.titulo}
                 </span>
-                <span className="block text-[11px] text-yellow-color/60">
+                <span className="block text-[11px] text-gray-400">
                   {d.sub}
                 </span>
               </button>
@@ -236,7 +236,7 @@ export default function App() {
             </span>
           </div>
 
-          <h2 className="text-2xl font-bold mb-2 cyberpunk glitched">¿Quién eres en esta historia?</h2>
+          <h2 className="text-2xl font-bold mb-2 cyberpunk">¿Quién eres en esta historia?</h2>
           <p className="cyberpunk inverse text-sm mb-6">Tu rol determina cómo te golpea la crisis y qué puedes hacer.</p>
 
           <div className="grid grid-cols-1 gap-3 mb-8">
@@ -254,11 +254,11 @@ export default function App() {
                 }}
                 className={`flex items-center gap-4 p-4 border-2 transition-all text-left ${
                   state.roleId === r.id 
-                    ? "border-red-color bg-red-color/10 text-yellow-color" 
-                    : "border-yellow-color/20 bg-black text-yellow-color/60 hover:border-yellow-color/40"
+                    ? "border-black bg-black text-white" 
+                    : "border-gray-200 bg-white text-gray-600 hover:border-gray-400"
                 }`}
               >
-                <div className={`p-2 rounded-lg ${state.roleId === r.id ? "bg-red-color/20 text-red-color" : "bg-yellow-color/10 text-yellow-color/40"}`}>
+                <div className={`p-2 rounded-lg ${state.roleId === r.id ? "bg-gray-800 text-white" : "bg-gray-100 text-gray-400"}`}>
                   {r.icon}
                 </div>
                 <span className="text-sm font-medium">{r.label}</span>
@@ -326,7 +326,7 @@ export default function App() {
             </button>
           </div>
 
-          <h2 className="text-2xl font-bold mb-2 cyberpunk glitched">¿Dónde golpea más fuerte?</h2>
+          <h2 className="text-2xl font-bold mb-2 cyberpunk">¿Dónde golpea más fuerte?</h2>
           <p className="cyberpunk inverse text-sm mb-6">Toca la zona donde crees que el impacto es más severo para tu rol y tu comunidad.</p>
 
           <div className="space-y-3 mb-8">
@@ -340,16 +340,16 @@ export default function App() {
                 onClick={() => setState(prev => ({ ...prev, impactId: i.id }))}
                 className={`flex items-center gap-4 p-4 border-2 transition-all text-left w-full ${
                   state.impactId === i.id 
-                    ? "border-red-color bg-red-color/10 text-yellow-color" 
-                    : "border-yellow-color/20 bg-black text-yellow-color/60 hover:border-yellow-color/40"
+                    ? "border-black bg-black text-white" 
+                    : "border-gray-200 bg-white text-gray-600 hover:border-gray-400"
                 }`}
               >
-                <div className={`p-3 rounded-xl ${state.impactId === i.id ? "bg-red-color/20 text-red-color" : "bg-yellow-color/10 text-yellow-color/40"}`}>
+                <div className={`p-3 rounded-xl ${state.impactId === i.id ? "bg-gray-800 text-white" : "bg-gray-100 text-gray-400"}`}>
                   {i.icon}
                 </div>
                 <div>
                   <p className="text-sm font-semibold">{i.label}</p>
-                  <p className="text-[11px] text-yellow-color/40">{i.sub}</p>
+                  <p className="text-[11px] text-gray-500">{i.sub}</p>
                 </div>
               </button>
             ))}
@@ -357,10 +357,10 @@ export default function App() {
 
           {state.impactId && (
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-300 mt-auto">
-              <div className="bg-green-color/5 border border-green-color/20 p-4 mb-6">
+              <div className="bg-gray-50 border border-gray-200 p-4 mb-6">
                 <div className="flex items-center gap-2 mb-2">
-                  <div className="w-1.5 h-1.5 rounded-full bg-green-color animate-pulse" />
-                  <p className="text-[10px] text-green-color uppercase tracking-widest font-bold">Copiloto IA · impacto inesperado</p>
+                  <div className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-pulse" />
+                  <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Copiloto IA · impacto inesperado</p>
                 </div>
                 <p className="cyberpunk text-xs">
                   {AI_IMPACTO[`${state.impactId}-${state.disruptionId}`]}
@@ -382,7 +382,7 @@ export default function App() {
             </button>
           </div>
 
-          <h2 className="text-2xl font-bold mb-2 cyberpunk glitched">¿Qué hace que esto empeore?</h2>
+          <h2 className="text-2xl font-bold mb-2 cyberpunk">¿Qué hace que esto empeore?</h2>
           <p className="cyberpunk inverse text-sm mb-6">Elige la restricción que más limita la respuesta. Tu elección define el final.</p>
 
           <div className="space-y-3 mb-8">
@@ -396,13 +396,13 @@ export default function App() {
                 onClick={() => setState(prev => ({ ...prev, restrictionId: r.id }))}
                 className={`w-full p-4 text-left border-2 transition-all ${
                   state.restrictionId === r.id 
-                    ? "border-orange-color bg-orange-color/10 text-yellow-color" 
-                    : "border-yellow-color/20 bg-black text-yellow-color/60 hover:border-yellow-color/40"
+                    ? "border-black bg-black text-white" 
+                    : "border-gray-200 bg-white text-gray-600 hover:border-gray-400"
                 }`}
               >
-                <span className="block text-[9px] text-orange-color uppercase tracking-widest font-bold mb-1">Restricción {idx + 1}</span>
+                <span className="block text-[9px] text-gray-500 uppercase tracking-widest font-bold mb-1">Restricción {idx + 1}</span>
                 <span className="block text-sm font-semibold mb-0.5">{r.label}</span>
-                <span className="block text-[11px] text-yellow-color/40">{r.sub}</span>
+                <span className="block text-[11px] text-gray-400">{r.sub}</span>
               </button>
             ))}
           </div>
@@ -411,11 +411,11 @@ export default function App() {
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-300 mt-auto">
               <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
                 {CADENAS[`${state.restrictionId}-${state.disruptionId}`].map((text, i) => (
-                  <div key={i} className="flex-1 min-w-[100px] bg-orange-color/5 border border-orange-color/20 p-3 text-center">
-                    <p className="text-[9px] text-orange-color uppercase font-bold mb-1">
+                  <div key={i} className="flex-1 min-w-[100px] bg-gray-50 border border-gray-200 p-3 text-center">
+                    <p className="text-[9px] text-gray-500 uppercase font-bold mb-1">
                       {i === 0 ? "Hoy" : i === 1 ? "6 meses" : "3 años"}
                     </p>
-                    <p className="text-[10px] text-yellow-color/80 leading-tight">{text}</p>
+                    <p className="text-[10px] text-gray-600 leading-tight">{text}</p>
                   </div>
                 ))}
               </div>
@@ -435,7 +435,7 @@ export default function App() {
             </button>
           </div>
 
-          <h2 className="text-2xl font-bold mb-2 cyberpunk glitched">¿Qué habrías hecho tú?</h2>
+          <h2 className="text-2xl font-bold mb-2 cyberpunk">¿Qué habrías hecho tú?</h2>
           <p className="cyberpunk inverse text-sm mb-6">Inspírate en una de estas ideas o escribe la tuya — máximo 10 palabras.</p>
 
           <div className="space-y-2 mb-6">
@@ -445,8 +445,8 @@ export default function App() {
                 onClick={() => setState(prev => ({ ...prev, actionText: spark }))}
                 className={`w-full p-3 text-left border text-xs transition-all ${
                   state.actionText === spark 
-                    ? "border-red-color bg-red-color/5 text-yellow-color" 
-                    : "border-yellow-color/20 bg-black text-yellow-color/40 hover:text-yellow-color/60"
+                    ? "border-black bg-black/5 text-black font-bold" 
+                    : "border-gray-200 bg-white text-gray-500 hover:text-gray-700 hover:border-gray-300"
                 }`}
               >
                 {spark}
@@ -462,17 +462,17 @@ export default function App() {
               className="cyberpunk w-full"
             />
             <div className="flex justify-end mt-2">
-              <span className={`text-[10px] font-mono font-bold ${state.actionText.split(/\s+/).filter(Boolean).length > 10 ? "text-red-color" : "text-black/60"}`}>
+              <span className={`text-[10px] font-mono font-bold ${state.actionText.split(/\s+/).filter(Boolean).length > 10 ? "text-black underline decoration-double" : "text-black/60"}`}>
                 {state.actionText.split(/\s+/).filter(Boolean).length} / 10 palabras
               </span>
             </div>
           </div>
 
           {state.actionText.split(/\s+/).filter(Boolean).length >= 3 && (
-            <div className="bg-purple-color/5 border border-purple-color/20 p-4 mb-6 animate-in fade-in duration-500">
+            <div className="bg-gray-50 border border-gray-200 p-4 mb-6 animate-in fade-in duration-500">
               <div className="flex items-center gap-2 mb-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-purple-color animate-pulse" />
-                <p className="text-[10px] text-purple-color uppercase tracking-widest font-bold">Copiloto IA</p>
+                <div className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-pulse" />
+                <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Copiloto IA</p>
               </div>
               <p className="cyberpunk text-xs italic">
                 "Buena idea — funciona mejor si la repites con otros. ¿Qué pasaría si diez personas en tu sector hicieran lo mismo al tiempo?"
@@ -499,19 +499,19 @@ export default function App() {
           <ProgressBar step={6} totalSteps={6} label="Experiencia completa" />
           
           <div className="text-center mb-8">
-            <div className="w-12 h-12 rounded-full bg-green-color/10 border border-green-color flex items-center justify-center mx-auto mb-4 text-green-color">
+            <div className="w-12 h-12 rounded-full bg-gray-100 border border-gray-300 flex items-center justify-center mx-auto mb-4 text-gray-600">
               <CheckCircle2 size={24} />
             </div>
             <span className="text-[10px] text-black/60 uppercase tracking-widest font-bold mb-1 block">Tu resultado</span>
-            <h2 className="text-2xl font-bold cyberpunk glitched">{FINALES[`${state.disruptionId}-${state.restrictionId}`]?.titulo}</h2>
+            <h2 className="text-2xl font-bold cyberpunk">{FINALES[`${state.disruptionId}-${state.restrictionId}`]?.titulo}</h2>
           </div>
 
           <div className="space-y-4 mb-8">
             <div className="flex justify-center">
               <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase border ${
-                FINALES[`${state.disruptionId}-${state.restrictionId}`]?.resultado === 'bad' ? "bg-red-color/10 border-red-color text-red-color" :
-                FINALES[`${state.disruptionId}-${state.restrictionId}`]?.resultado === 'ok' ? "bg-orange-color/10 border-orange-color text-orange-color" :
-                "bg-green-color/10 border-green-color text-green-color"
+                FINALES[`${state.disruptionId}-${state.restrictionId}`]?.resultado === 'bad' ? "bg-gray-100 border-gray-400 text-gray-600" :
+                FINALES[`${state.disruptionId}-${state.restrictionId}`]?.resultado === 'ok' ? "bg-gray-50 border-gray-300 text-gray-500" :
+                "bg-gray-200 border-gray-500 text-gray-800"
               }`}>
                 {FINALES[`${state.disruptionId}-${state.restrictionId}`]?.resultado === 'bad' ? "Camino difícil" :
                  FINALES[`${state.disruptionId}-${state.restrictionId}`]?.resultado === 'ok' ? "Camino posible" :
@@ -520,33 +520,33 @@ export default function App() {
             </div>
 
             <div className="p-4">
-              <div className="text-[10px] text-red-color uppercase font-bold mb-2 flex items-center gap-2">
-                <div className="w-1 h-1 rounded-full bg-red-color" /> Lo que pasaría
+              <div className="text-[10px] text-gray-500 uppercase font-bold mb-2 flex items-center gap-2">
+                <div className="w-1 h-1 rounded-full bg-gray-500" /> Lo que pasaría
               </div>
               <p className="cyberpunk text-sm">
                 {FINALES[`${state.disruptionId}-${state.restrictionId}`]?.texto}
               </p>
             </div>
 
-            <div className="bg-black border border-yellow-color/20 p-4">
-              <p className="text-[9px] text-yellow-color/40 uppercase font-bold mb-1">Tu jugada</p>
-              <p className="text-sm italic text-yellow-color">"{state.actionText}"</p>
+            <div className="bg-gray-100 border border-gray-200 p-4">
+              <p className="text-[9px] text-gray-500 uppercase font-bold mb-1">Tu jugada</p>
+              <p className="text-sm italic text-gray-700">"{state.actionText}"</p>
             </div>
 
-            <div className="bg-red-color/5 border border-red-color/20 p-4">
-              <div className="text-[10px] text-red-color uppercase font-bold mb-2 flex items-center gap-2">
-                <div className="w-1 h-1 rounded-full bg-red-color" /> Esto ya está pasando — versión real
+            <div className="bg-gray-50 border border-gray-200 p-4">
+              <div className="text-[10px] text-gray-500 uppercase font-bold mb-2 flex items-center gap-2">
+                <div className="w-1 h-1 rounded-full bg-gray-500" /> Esto ya está pasando — versión real
               </div>
               <p className="cyberpunk text-xs">
                 {FINALES[`${state.disruptionId}-${state.restrictionId}`]?.real}
               </p>
             </div>
 
-            <div className="bg-red-color/10 border border-red-color/30 p-5 text-center">
-              <p className="text-xs text-red-color/90 mb-3 leading-relaxed">
+            <div className="bg-gray-100 border border-gray-300 p-5 text-center">
+              <p className="text-xs text-gray-600 mb-3 leading-relaxed">
                 {FINALES[`${state.disruptionId}-${state.restrictionId}`]?.accion}
               </p>
-              <a href="https://conectividadsignificativa.co" target="_blank" className="text-sm font-bold text-red-color hover:underline">
+              <a href="https://conectividadsignificativa.co" target="_blank" className="text-sm font-bold text-black hover:underline">
                 conectividadsignificativa.co →
               </a>
             </div>

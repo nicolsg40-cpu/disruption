@@ -1,339 +1,134 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Advent+Pro:wght@400;700;900&family=Oxanium:wght@400;700;800&display=swap');
 
 @theme {
-  --glitched-duration: 0.9s;
-  --glitched-long-duration: 3s;
-  --yellow-color: #f9f002;
-  --yellow-color-opacity: #f9f00242;
-  --orange-color: #ff9800;
-  --border-color: #8ae66e;
-  --red-color: #ff003c;
-  --blue-color: #0c5f74;
-  --green-color: #298d29;
-  --purple-color: purple;
-  --neon-color: #39ff14;
-  --black-color: #000;
-}
-
-@font-face {
-  font-family: 'Hacked';
-  src: url(data:font/ttf;charset=utf-8;base64,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AEMrLbBaLLMBAQBDKy2wWyyzAAABQystsFwsswABAUMrLbBdLLMBAAFDKy2wXiyzAQEBQystsF8ssgAARSstsGAssgABRSstsGEssgEARSstsGIssgEBRSstsGMssgAASCstsGQssgABSCstsGUssgEASCstsGYssgEBSCstsGcsswAAAEQrLbBoLLMAAQBEKy2waSyzAQAARCstsGosswEBAEQrLbBrLLMAAAFEKy2wbCyzAAEBRCstsG0sswEAAUQrLbBuLLMBAQFEKy2wbyyxADwrLrEwARQrLbBwLLEAPCuwQCstsHEssQA8K7BBKy2wciywABaxADwrsEIrLbBzLLEBPCuwQCstsHQssQE8K7BBKy2wdSywABaxATwrsEIrLbB2LLEAPSsusTABFCstsHcssQA9K7BAKy2weCyxAD0rsEErLbB5LLEAPSuwQistsHossQE9K7BAKy2weyyxAT0rsEErLbB8LLEBPSuwQistsH0ssQA+Ky6xMAEUKy2wfiyxAD4rsEArLbB/LLEAPiuwQSstsIAssQA+K7BCKy2wgSyxAT4rsEArLbCCLLEBPiuwQSstsIMssQE+K7BCKy2whCyxAD8rLrEwARQrLbCFLLEAPyuwQCstsIYssQA/K7BBKy2whyyxAD8rsEIrLbCILLEBPyuwQCstsIkssQE/K7BBKy2wiiyxAT8rsEIrLbCLLLILAANFUFiwBhuyBAIDRVgjIRshWVlCK7AIZbADJFB4sQUBFUVYMFktAEu4AMhSWLEBAY5ZsAG5CAAIAGNwsQAHQrEAACqxAAdCsQAKKrEAB0KxAAoqsQAHQrkAAAALKrEAB0K5AAAACyq5AAMAAESxJAGIUViwQIhYuQADAGREsSgBiFFYuAgAiFi5AAMAAERZG7EnAYhRWLoIgAABBECIY1RYuQADAABEWVlZWVmxAA4quAH/hbAEjbECAESzBWQGAERE) format('truetype');
-  font-weight: 400;
-  font-style: normal;
+  --yellow-color: #f3f4f6; /* Light Gray for background */
+  --red-color: #000000;    /* Black for primary actions */
+  --blue-color: #6b7280;   /* Medium Gray for secondary actions */
+  --black-color: #000000;
+  --white-color: #ffffff;
 }
 
 @layer base {
   body {
     background-color: var(--yellow-color);
-    padding: 0px;
-    margin: 0px;
-    font-size: 20px;
-    font-family: "Advent Pro", arial, sans-serif;
+    color: var(--black-color);
+    font-family: 'Advent Pro', sans-serif;
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
   }
 }
 
-/* Paragraphs and lists */
-
+/* Paragraphs */
 p.cyberpunk,
 .cyberpunk p {
-  border: 10px solid var(--black-color);
-  border-right: 5px solid var(--black-color);
-  border-left: 5px solid var(--black-color);
-  border-bottom: 8px solid var(--black-color);
-  padding: 15px;
-  clip-path: polygon(0px 25px, 26px 0px, calc(60% - 25px) 0px, 60% 25px, 100% 25px, 100% calc(100% - 10px), calc(100% - 15px) calc(100% - 10px), calc(80% - 10px) calc(100% - 10px), calc(80% - 15px) 100%, 80px calc(100% - 0px), 65px calc(100% - 15px), 0% calc(100% - 15px));
   background-color: var(--yellow-color);
   color: var(--black-color);
-  font-size: 1.1rem;
-  font-weight: 600;
-  position: relative;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  font-weight: 700;
+  border: 4px solid var(--black-color);
+  display: block;
 }
 
 p.cyberpunk.inverse,
 .cyberpunk p.inverse {
-  border: 10px solid var(--yellow-color);
-  border-right: 5px solid var(--yellow-color);
-  border-left: 5px solid var(--yellow-color);
-  border-bottom: 8px solid var(--yellow-color);
-  padding: 15px;
-  clip-path: polygon(0px 25px, 26px 0px, calc(60% - 25px) 0px, 60% 25px, 100% 25px, 100% calc(100% - 10px), calc(100% - 15px) calc(100% - 10px), calc(80% - 10px) calc(100% - 10px), calc(80% - 15px) 100%, 80px calc(100% - 0px), 65px calc(100% - 15px), 0% calc(100% - 15px));
   background-color: var(--black-color);
   color: var(--yellow-color);
-  border-right: 3px solid var(--border-color);
-}
-
-p.cyberpunk:before,
-.cyberpunk p:before {
-  content: "P-14";
-  display: block;
-  position: absolute;
-  bottom: -12px;
-  right: 25px;
-  padding: 2px 2px 0px 2px;
-  font-size: 0.6rem;
-  line-height: 0.6rem;
-  color: var(--black-color);
-  background-color: var(--yellow-color);
-  border-left: 2px solid var(--border-color);
-}
-
-p.cyberpunk.inverse:before,
-.cyberpunk p.inverse:before {
-  content: "T-71";
-  right:90px;
-  bottom: 9px;
+  border: 4px solid var(--yellow-color);
 }
 
 /* Titles */
-
 h1.cyberpunk,
 h2.cyberpunk,
 h3.cyberpunk,
-h4.cyberpunk,
 .cyberpunk h1,
 .cyberpunk h2,
-.cyberpunk h3,
-.cyberpunk h4 {
-  font-size: 2rem;
-  line-height: 2.2rem;
-  font-weight: 200;
-  position: relative;
-  padding-bottom: 15px;
+.cyberpunk h3 {
+  font-family: 'Oxanium', sans-serif;
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+  color: var(--black-color);
+  font-weight: 900;
+  line-height: 1.1;
 }
 
-h1.cyberpunk:before,
-h2.cyberpunk:before,
-h3.cyberpunk:before,
-h4.cyberpunk:before,
-.cyberpunk h1:before,
-.cyberpunk h2:before,
-.cyberpunk h3:before,
-.cyberpunk h4:before {
-  content: "";
-  display: block;
-  position: absolute;
-  bottom: 0px;
-  left: 2px;
-  width: 100%;
-  height: 10px;
-  background-color: var(--black-color);
-  clip-path: polygon(0px 0px, 85px 0px, 90px 5px, 100% 5px, 100% 6px, 85px 6px, 80px 10px, 0px 10px);
-}
+h1.cyberpunk, .cyberpunk h1 { font-size: 2.5rem; border-bottom: 6px solid var(--black-color); }
+h2.cyberpunk, .cyberpunk h2 { font-size: 1.8rem; }
+h3.cyberpunk, .cyberpunk h3 { font-size: 1.4rem; }
 
-@keyframes hxafter {
-  0% { opacity: 0; }
-  50% { opacity: 0; }
-  51% { opacity: 1; }
-  100% { opacity: 1; }
-}
-
-h1.cyberpunk:after,
-h2.cyberpunk:after,
-h3.cyberpunk:after,
-h4.cyberpunk:after,
-p.cyberpunk:after,
-.cyberpunk h1:after,
-.cyberpunk h2:after,
-.cyberpunk h3:after,
-.cyberpunk h4:after,
-.cyberpunk p:after {
-  content: "_";
-  animation: hxafter var(--glitched-duration) linear infinite;
+.cyberpunk.inverse h1,
+.cyberpunk.inverse h2,
+.cyberpunk.inverse h3 {
+  color: var(--yellow-color);
+  border-color: var(--yellow-color);
 }
 
 /* Buttons */
-
 button.cyberpunk,
-input[type=submit].cyberpunk, 
-a.cyberpunk {
-  --text: "R-25";
-  --background-color: var(--red-color);
-  display: inline-block;
-  border: none;
-  border-radius: 0%;
-  font-size: 1.5rem;
-  line-height: 1.5rem;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  font-weight: 600;
-  padding: 35px 75px;
-  margin: 10px 20px 10px 0px;
-  position: relative;
-  color: #fff;
-  border-right: 3px solid var(--border-color);
-  clip-path: polygon(
-    -15px 0%,
-    calc(100% + 15px) 0%,
-    calc(100% + 15px) 100%,
-    20px 100%,
-    -15px calc(100% - 35px)
-  );
-  cursor: pointer;
-  background-color: var(--background-color);
-  outline: none;
-}
-
-@keyframes buttonhover {
-  0% { transform: skew(0deg); }
-  60% { transform: skew(0deg); }
-  61% { transform: skew(10deg); }
-  70% { transform: skew(10deg); }
-  71% { transform: skew(0deg); }
-  100% { transform: skew(0deg); }
-}
-
-button.cyberpunk:hover,
-a.cyberpunk:hover,
-input[type=submit].cyberpunk:hover {
-  animation: buttonhover var(--glitched-duration) linear infinite;
-}
-
-button.cyberpunk:after,
-input[type=submit].cyberpunk:after,
-a.cyberpunk:after {
-  content: var(--text);
+.cyber-button {
   display: block;
-  position: absolute;
-  bottom: 0px;
-  right: 25px;
-  padding: 2px 2px 0px 2px;
-  font-size: 0.6rem;
-  line-height: 0.6rem;
+  width: 100%;
+  background-color: var(--red-color);
+  color: var(--white-color);
+  padding: 1.2rem;
+  font-family: 'Oxanium', sans-serif;
+  font-weight: 800;
+  text-transform: uppercase;
+  border: 4px solid var(--black-color);
+  cursor: pointer;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+button.cyberpunk:hover {
+  background-color: var(--black-color);
+  color: var(--yellow-color);
+}
+
+button.cyberpunk.secondary {
+  background-color: var(--blue-color);
+}
+
+/* Inputs */
+input.cyberpunk,
+textarea.cyberpunk {
+  width: 100%;
+  background-color: var(--white-color);
+  border: 4px solid var(--black-color);
+  padding: 1rem;
+  font-family: 'Oxanium', sans-serif;
+  font-weight: 700;
   color: var(--black-color);
-  background-color: var(--yellow-color);
-  border-left: 2px solid var(--border-color);
+  margin-bottom: 1rem;
 }
 
 /* Section */
 section.cyberpunk {
   background-color: var(--yellow-color);
   color: var(--black-color);
-  padding: 60px 60px;
-  position: relative;
-  margin-top: -1px;
-  margin-bottom: -1px;
-}
-
-section.cyberpunk:after {
-  content: " ";
-  display: block;
-  bottom: 0px;
-  left: 0px;
-  width: 100%;
-  height: 30px;
-  background-color: var(--black-color);
-  position: absolute;
-  clip-path: polygon(0% 0%, 22% 0%, calc(22% + 30px) 30px, 52% 30px, calc(52% + 15px) 15px, 70% 15px, calc(70% + 15px) 30px, 90% 30px, calc(90% + 30px) 0px, 100% 0px, 100% 30px, 0px 30px);
-}
-
-section.cyberpunk.black {
-  background-color: var(--black-color);
-  color: var(--yellow-color);
-}
-
-section.cyberpunk.black:after {
-  background-color: var(--yellow-color);
+  padding: 1.5rem;
+  min-height: 100vh;
 }
 
 /* Steps */
-
 .cyberpunk ul.steps {
-  --size: 25px;
-  margin: 0px;
-  list-style-type: none;
   display: flex;
-  flex-wrap: wrap;
-  counter-reset: my-counter;
-  flex-direction: column;
-  align-items: stretch;
-  justify-content: flex-start;
-  align-content: center;
-}
-
-@media (min-width: 600px) {
-  .cyberpunk ul.steps {
-    flex-direction: row;
-  }
+  gap: 8px;
+  list-style: none;
+  padding: 0;
+  margin-bottom: 1.5rem;
 }
 
 .cyberpunk ul.steps li {
-  display: flex;
-  align-items: end;
-  color: var(--black-color);
-  padding: 0px 20px 5px 0px;
-  position: relative;
-  font-size: 12px;
-  line-height: 12px;
-  min-width: 80px;
-  margin-bottom: 40px;
-  counter-increment: my-counter;
-  padding-left: 50px;
-}
-
-.cyberpunk.black ul.steps li {
-  color: var(--yellow-color)
-}
-
-.cyberpunk ul.steps li:before {
-  position: absolute;
-  content: counter(my-counter);
-  color: var(--yellow-color);
-  background-color: var(--purple-color);
-  display: flex;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  bottom: -8px;
-  left: 0px;
-  font-size: 20px;
-  font-weight: 700;
-  justify-content: center;
-  align-items: center;
-}
-
-.cyberpunk ul.steps li.current:before {
+  flex: 1;
+  height: 12px;
   background-color: var(--black-color);
+  opacity: 0.2;
 }
 
-.cyberpunk.black ul.steps li.current:before {
-  background-color: var(--yellow-color);
-  color: var(--black-color);
-}
-
-/* Scrollbar */
-
-::-webkit-scrollbar {
-  background-color: var(--yellow-color);
-}
-::-webkit-scrollbar-thumb {
+.cyberpunk ul.steps li.current {
+  opacity: 1;
   background-color: var(--red-color);
-  border-bottom: 2px solid var(--border-color);
-  border-right: 2px solid var(--border-color);
-}
-
-/* Form fields */
-
-input[type="text"].cyberpunk,
-textarea.cyberpunk,
-select.cyberpunk {
-  width: calc(100% - 30px);
-  border: 30px solid var(--black-color);
-  border-left: 5px solid var(--black-color);
-  border-right: 5px solid var(--black-color);
-  border-bottom: 15px solid var(--black-color);
-  clip-path: polygon(0px 25px, 26px 0px, calc(60% - 25px) 0px, 60% 25px, 100% 25px, 100% calc(100% - 10px), calc(100% - 15px) calc(100% - 10px), calc(80% - 10px)  calc(100% - 10px), calc(80% - 15px) calc(100% - 0px), 10px  calc(100% - 0px), 0% calc(100% - 10px));
-  margin-bottom: 10px;
-  padding: 12px;
-  font-size: 1.7rem;
-  font-weight: 700;
-  background-color: var(--yellow-color);
-  color: var(--black-color);
-}
-
-section.cyberpunk.black input[type="text"].cyberpunk,
-section.cyberpunk.black textarea.cyberpunk,
-section.cyberpunk.black select.cyberpunk {
-  border-color: var(--yellow-color);
-  background-color: var(--black-color);
-  color: var(--yellow-color); 
 }

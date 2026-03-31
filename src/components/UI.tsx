@@ -10,7 +10,7 @@ interface ScreenWrapperProps {
 export const ScreenWrapper = ({ children, isVisible }: ScreenWrapperProps) => {
   if (!isVisible) return null;
   return (
-    <section className="cyberpunk flex flex-col h-full w-full p-6 pt-8 min-h-screen">
+    <section className="cyberpunk flex flex-col h-full w-full p-6 pt-8 min-h-screen overflow-y-auto">
       {children}
     </section>
   );
@@ -54,10 +54,7 @@ export const Button = ({ onClick, children, variant = "primary", className = "",
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`${baseStyles} ${className}`}
-      style={{
-        "--background-color": variant === "primary" ? "var(--red-color)" : "var(--blue-color)"
-      } as any}
+      className={`${baseStyles} ${variant === "secondary" ? "secondary" : ""} ${className}`}
     >
       {children}
     </button>
