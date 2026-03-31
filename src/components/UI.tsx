@@ -10,7 +10,7 @@ interface ScreenWrapperProps {
 export const ScreenWrapper = ({ children, isVisible }: ScreenWrapperProps) => {
   if (!isVisible) return null;
   return (
-    <section className="cyberpunk black flex flex-col h-full w-full p-6 pt-8 min-h-screen">
+    <section className="cyberpunk flex flex-col h-full w-full p-6 pt-8 min-h-screen">
       {children}
     </section>
   );
@@ -32,7 +32,7 @@ export const ProgressBar = ({ step, totalSteps, label }: ProgressBarProps) => {
           </li>
         ))}
       </ul>
-      <p className="text-[10px] text-yellow-color uppercase tracking-widest mt-2 font-bold">
+      <p className="text-[10px] text-black uppercase tracking-widest mt-2 font-bold">
         {label}
       </p>
     </div>

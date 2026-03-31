@@ -150,7 +150,7 @@ export default function App() {
   const currentDisruption = state.disruptionId ? DISRUPCIONES[state.disruptionId] : null;
 
   return (
-    <div className="min-h-screen bg-black flex justify-center items-start overflow-x-hidden">
+    <div className="min-h-screen bg-yellow-color flex justify-center items-start overflow-x-hidden">
       {/* Background Audio */}
       <audio 
         ref={audioRef}
@@ -168,7 +168,7 @@ export default function App() {
         {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
       </button>
 
-      <div className="w-full max-w-[420px] min-h-screen flex flex-col relative bg-black border-x border-yellow-color/20">
+      <div className="w-full max-w-[420px] min-h-screen flex flex-col relative bg-yellow-color border-x border-black/10">
         
         {/* Welcome Screen */}
         <ScreenWrapper isVisible={screen === "welcome"}>
@@ -179,12 +179,12 @@ export default function App() {
             <h1 className="text-4xl font-bold leading-tight mb-6 cyberpunk glitched">
               Hackea la<br />Disrupción
             </h1>
-            <p className="cyberpunk inverse leading-relaxed mb-8">
+            <p className="cyberpunk leading-relaxed mb-8">
               El futuro del trabajo ya llegó — y no pidió permiso.<br /><br />
-              En <span className="text-yellow-color font-medium">5 minutos</span> vas a elegir una crisis real, sentirla desde adentro y pensar qué harías tú para enfrentarla.
+              En <span className="text-red-color font-bold">5 minutos</span> vas a elegir una crisis real, sentirla desde adentro y pensar qué harías tú para enfrentarla.
             </p>
             <div className="p-4 mb-8">
-              <p className="cyberpunk text-sm">
+              <p className="cyberpunk inverse text-sm">
                 Tus decisiones determinan el camino. No hay respuestas correctas — hay consecuencias.
               </p>
             </div>
@@ -198,7 +198,7 @@ export default function App() {
         <ScreenWrapper isVisible={screen === "disruption"}>
           <ProgressBar step={1} totalSteps={6} label="Paso 1 de 6 · Elige tu disrupción" />
           <h2 className="text-2xl font-bold mb-2 cyberpunk glitched">¿Qué crisis te preocupa más?</h2>
-          <p className="cyberpunk text-sm mb-6">Cada disrupción abre un camino diferente. Elige la que más te toca.</p>
+          <p className="cyberpunk inverse text-sm mb-6">Cada disrupción abre un camino diferente. Elige la que más te toca.</p>
           
           <div className="space-y-3 mb-8">
             {Object.values(DISRUPCIONES).map((d) => (
@@ -237,7 +237,7 @@ export default function App() {
           </div>
 
           <h2 className="text-2xl font-bold mb-2 cyberpunk glitched">¿Quién eres en esta historia?</h2>
-          <p className="cyberpunk text-sm mb-6">Tu rol determina cómo te golpea la crisis y qué puedes hacer.</p>
+          <p className="cyberpunk inverse text-sm mb-6">Tu rol determina cómo te golpea la crisis y qué puedes hacer.</p>
 
           <div className="grid grid-cols-1 gap-3 mb-8">
             {[
@@ -327,7 +327,7 @@ export default function App() {
           </div>
 
           <h2 className="text-2xl font-bold mb-2 cyberpunk glitched">¿Dónde golpea más fuerte?</h2>
-          <p className="cyberpunk text-sm mb-6">Toca la zona donde crees que el impacto es más severo para tu rol y tu comunidad.</p>
+          <p className="cyberpunk inverse text-sm mb-6">Toca la zona donde crees que el impacto es más severo para tu rol y tu comunidad.</p>
 
           <div className="space-y-3 mb-8">
             {[
@@ -383,7 +383,7 @@ export default function App() {
           </div>
 
           <h2 className="text-2xl font-bold mb-2 cyberpunk glitched">¿Qué hace que esto empeore?</h2>
-          <p className="cyberpunk text-sm mb-6">Elige la restricción que más limita la respuesta. Tu elección define el final.</p>
+          <p className="cyberpunk inverse text-sm mb-6">Elige la restricción que más limita la respuesta. Tu elección define el final.</p>
 
           <div className="space-y-3 mb-8">
             {[
@@ -436,7 +436,7 @@ export default function App() {
           </div>
 
           <h2 className="text-2xl font-bold mb-2 cyberpunk glitched">¿Qué habrías hecho tú?</h2>
-          <p className="cyberpunk text-sm mb-6">Inspírate en una de estas ideas o escribe la tuya — máximo 10 palabras.</p>
+          <p className="cyberpunk inverse text-sm mb-6">Inspírate en una de estas ideas o escribe la tuya — máximo 10 palabras.</p>
 
           <div className="space-y-2 mb-6">
             {state.disruptionId && SPARKS[state.disruptionId].map((spark, i) => (
@@ -462,7 +462,7 @@ export default function App() {
               className="cyberpunk w-full"
             />
             <div className="flex justify-end mt-2">
-              <span className={`text-[10px] font-mono ${state.actionText.split(/\s+/).filter(Boolean).length > 10 ? "text-red-color" : "text-yellow-color/40"}`}>
+              <span className={`text-[10px] font-mono font-bold ${state.actionText.split(/\s+/).filter(Boolean).length > 10 ? "text-red-color" : "text-black/60"}`}>
                 {state.actionText.split(/\s+/).filter(Boolean).length} / 10 palabras
               </span>
             </div>
@@ -502,7 +502,7 @@ export default function App() {
             <div className="w-12 h-12 rounded-full bg-green-color/10 border border-green-color flex items-center justify-center mx-auto mb-4 text-green-color">
               <CheckCircle2 size={24} />
             </div>
-            <span className="text-[10px] text-yellow-color/40 uppercase tracking-widest font-bold mb-1 block">Tu resultado</span>
+            <span className="text-[10px] text-black/60 uppercase tracking-widest font-bold mb-1 block">Tu resultado</span>
             <h2 className="text-2xl font-bold cyberpunk glitched">{FINALES[`${state.disruptionId}-${state.restrictionId}`]?.titulo}</h2>
           </div>
 
