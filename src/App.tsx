@@ -14,7 +14,7 @@ import { ScreenWrapper, ProgressBar, Button } from "./components/UI";
 import { ChevronLeft, Zap, User, CheckCircle2, Loader2, Volume2, VolumeX, Copy, Check } from "lucide-react";
 import { db, collection, addDoc, updateDoc, onSnapshot, serverTimestamp, doc, getDocFromServer } from "./firebase";
 
-type Screen = "welcome" | "waiting" | "selecting_shock" | "playing" | "revealing" | "finished";
+type Screen = "welcome" | "waiting" | "assigning_roles" | "shock_reveal" | "playing" | "revealing" | "finished";
 
 interface PlayerState {
   roleId: string;
@@ -25,7 +25,7 @@ interface PlayerState {
 
 interface Session {
   id: string;
-  status: "waiting" | "selecting_shock" | "playing" | "revealing" | "finished";
+  status: "waiting" | "assigning_roles" | "shock_reveal" | "playing" | "revealing" | "finished";
   hostId: string;
   shockId?: number;
   players: Record<string, PlayerState>;
@@ -38,7 +38,7 @@ export default function App() {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [playerId, setPlayerId] = useState<string | null>(null);
-  const [isMuted, setIsMuted] = useState(true);
+  const [isMuted, setIsMuted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [joinId, setJoinId] = useState("");
   const [copied, setCopied] = useState(false);
@@ -65,7 +65,8 @@ export default function App() {
         
         // Update screen based on session status
         if (data.status === "waiting") setScreen("waiting");
-        else if (data.status === "selecting_shock") setScreen("selecting_shock");
+        else if (data.status === "assigning_roles") setScreen("assigning_roles");
+        else if (data.status === "shock_reveal") setScreen("shock_reveal");
         else if (data.status === "playing") setScreen("playing");
         else if (data.status === "revealing") setScreen("revealing");
         else if (data.status === "finished") setScreen("finished");
@@ -76,6 +77,28 @@ export default function App() {
       }
     }, (err) => {
       setError("Error de conexión: " + err.message);
+    });
+
+    return () => unsubscribe();
+  }, [sessionId]);
+
+  // Session synchronization
+  useEffect(() => {
+    if (!sessionId) return;
+
+    const unsubscribe = onSnapshot(doc(db, "sessions", sessionId), (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data() as Omit<Session, 'id'>;
+        setSession({ id: docSnap.id, ...data });
+        
+        // Update screen based on session status
+        if (data.status === "waiting") setScreen("waiting");
+        else if (data.status === "assigning_roles") setScreen("assigning_roles");
+        else if (data.status === "shock_reveal") setScreen("shock_reveal");
+        else if (data.status === "playing") setScreen("playing");
+        else if (data.status === "revealing") setScreen("revealing");
+        else if (data.status === "finished") setScreen("finished");
+      }
     });
 
     return () => unsubscribe();
@@ -135,35 +158,45 @@ export default function App() {
     }
   };
 
-  const startShockSelection = async () => {
+  const assignRoles = async () => {
     if (!sessionId || !session) return;
+    const playerIds = Object.keys(session.players);
+    const shuffledRoles = [...ROLES].sort(() => Math.random() - 0.5);
+    
+    const updates: any = {
+      status: "assigning_roles"
+    };
+
+    playerIds.forEach((id, index) => {
+      updates[`players.${id}.roleId`] = shuffledRoles[index % shuffledRoles.length].id;
+    });
+
     try {
-      await updateDoc(doc(db, "sessions", sessionId), {
-        status: "selecting_shock"
-      });
+      await updateDoc(doc(db, "sessions", sessionId), updates);
     } catch (err) {
-      setError("Error al iniciar selección: " + err.message);
+      console.error("Error assigning roles:", err);
     }
   };
 
-  const selectShock = async (shockId: number) => {
-    if (!sessionId || !session) return;
+  const startShockReveal = async () => {
+    if (!sessionId) return;
+    const shockIds = Object.keys(DISRUPCIONES).map(Number);
+    const randomShockId = shockIds[Math.floor(Math.random() * shockIds.length)];
+    
     try {
-      // Assign random roles to players
-      const shuffledRoles = [...ROLES].sort(() => 0.5 - Math.random());
-      const playerIds = Object.keys(session.players);
-      const updates: any = {
-        status: "playing",
-        shockId: shockId
-      };
-      
-      playerIds.forEach((id, index) => {
-        updates[`players.${id}.roleId`] = shuffledRoles[index].id;
+      await updateDoc(doc(db, "sessions", sessionId), {
+        status: "shock_reveal",
+        shockId: randomShockId
       });
-
-      await updateDoc(doc(db, "sessions", sessionId), updates);
+      
+      // Auto-transition to playing after 6 seconds of reveal
+      setTimeout(async () => {
+        await updateDoc(doc(db, "sessions", sessionId), {
+          status: "playing"
+        });
+      }, 6000);
     } catch (err) {
-      setError("Error al seleccionar shock: " + err.message);
+      console.error("Error starting shock reveal:", err);
     }
   };
 
@@ -235,19 +268,37 @@ export default function App() {
   // Auto-start game when 3 players join
   useEffect(() => {
     if (isHost && session?.status === "waiting" && Object.keys(session.players).length === 3) {
-      console.log("3 players detected, auto-starting...");
+      console.log("3 players detected, auto-assigning roles...");
       const timer = setTimeout(() => {
-        startShockSelection();
+        assignRoles();
       }, 1500);
       return () => clearTimeout(timer);
     }
   }, [session?.players, session?.status, isHost, sessionId]);
 
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = 0.2;
+      if (!isMuted && screen !== "welcome") {
+        audioRef.current.play().catch(() => {
+          console.log("Audio playback blocked by browser");
+        });
+      } else {
+        audioRef.current.pause();
+      }
+    }
+  }, [isMuted, screen]);
+
   const toggleMute = () => setIsMuted(!isMuted);
 
   return (
     <div className="min-h-screen bg-[#050505] flex justify-center items-start overflow-x-hidden font-['Advent_Pro'] relative text-white">
-      <audio ref={audioRef} src="distopic.mp3" loop playsInline />
+      <audio 
+        ref={audioRef} 
+        src="https://cdn.pixabay.com/audio/2022/03/10/audio_c8c8a73456.mp3" 
+        loop 
+        playsInline 
+      />
       {/* Note: distopic.mp3 is optional and not provided in the initial assets */}
 
       {/* Mute Toggle */}
@@ -314,7 +365,7 @@ export default function App() {
 
         {/* Waiting Screen */}
         <ScreenWrapper isVisible={screen === "waiting"}>
-          <ProgressBar step={1} totalSteps={5} label="Esperando jugadores..." />
+          <ProgressBar step={1} totalSteps={6} label="Esperando jugadores..." />
           <div className="flex-1 flex flex-col justify-center text-center">
             <div className="mb-8">
               <div className="text-[10px] text-neon-cyan uppercase font-bold mb-2">ID DE SESIÓN</div>
@@ -349,7 +400,7 @@ export default function App() {
                 <div className="text-neon-yellow text-[10px] font-bold animate-pulse mb-2 uppercase tracking-tighter">
                   &gt; TODOS LOS JUGADORES CONECTADOS. INICIANDO...
                 </div>
-                <Button onClick={startShockSelection} className="shadow-[0_0_20px_rgba(255,255,0,0.3)]">
+                <Button onClick={assignRoles} className="shadow-[0_0_20px_rgba(255,255,0,0.3)]">
                   INICIAR PROTOCOLO AHORA →
                 </Button>
               </div>
@@ -362,39 +413,81 @@ export default function App() {
           </div>
         </ScreenWrapper>
 
-        {/* Selecting Shock Screen */}
-        <ScreenWrapper isVisible={screen === "selecting_shock"}>
-          <ProgressBar step={2} totalSteps={5} label="Paso 2 de 5 · Elección del Shock" />
-          {isHost ? (
-            <>
-              <h2 className="text-2xl font-bold mb-2 cyberpunk">Elige la carta del desastre</h2>
-              <p className="text-neon-cyan/70 text-xs uppercase tracking-widest mb-6 font-bold">&gt; SELECCIONA EL ESCENARIO PARA EL GRUPO</p>
-              <div className="space-y-3 mb-8">
-                {Object.values(DISRUPCIONES).map((d) => (
-                  <button
-                    key={d.id}
-                    onClick={() => selectShock(d.id)}
-                    className="w-full p-4 text-left border-2 border-neon-pink/30 bg-surface-dark hover:border-neon-pink hover:bg-neon-pink/10 transition-all group relative overflow-hidden"
-                  >
-                    <div className="absolute top-0 right-0 p-1 bg-neon-pink/20 text-[8px] font-bold text-neon-pink uppercase">{d.tag}</div>
-                    <span className="block text-sm font-black text-neon-yellow mb-1 group-hover:text-white transition-colors uppercase italic">{d.titulo}</span>
-                    <span className="block text-[11px] text-neon-cyan/60 font-medium">{d.sub}</span>
-                  </button>
-                ))}
-              </div>
-            </>
-          ) : (
-            <div className="flex-1 flex flex-col justify-center text-center">
-              <Loader2 className="w-12 h-12 text-neon-pink animate-spin mx-auto mb-6" />
-              <h2 className="text-2xl font-bold mb-4 cyberpunk uppercase italic">EL ANFITRIÓN ESTÁ ELIGIENDO EL SHOCK...</h2>
-              <p className="text-neon-cyan/60 text-sm italic">Prepárate para tu rol.</p>
+        {/* Assigning Roles Screen */}
+        <ScreenWrapper isVisible={screen === "assigning_roles"}>
+          <ProgressBar step={2} totalSteps={6} label="Paso 2 de 6 · Asignación de Roles" />
+          <div className="flex-1 flex flex-col justify-center text-center">
+            <h2 className="text-3xl font-black mb-8 cyberpunk uppercase italic tracking-tighter">
+              IDENTIDAD ASIGNADA
+            </h2>
+            
+            <div className="mb-12 p-8 bg-surface-dark border-2 border-neon-yellow relative overflow-hidden group">
+              <div className="absolute top-0 right-0 p-2 bg-neon-yellow text-bg-dark text-[10px] font-bold uppercase">TU ROL</div>
+              <h4 className="text-3xl font-black text-neon-yellow italic mb-4 uppercase tracking-tighter">
+                {ROLES.find(r => r.id === playerState?.roleId)?.name}
+              </h4>
+              <p className="text-sm text-neon-cyan/80 leading-relaxed font-medium max-w-md mx-auto">
+                {ROLES.find(r => r.id === playerState?.roleId)?.description}
+              </p>
             </div>
-          )}
+
+            {isHost ? (
+              <div className="space-y-4">
+                <p className="text-neon-cyan text-xs font-bold animate-pulse uppercase">&gt; TODOS LOS ROLES ASIGNADOS</p>
+                <Button onClick={startShockReveal} className="shadow-[0_0_20px_rgba(0,243,255,0.3)]">
+                  REVELAR SHOCK →
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <Loader2 className="w-8 h-8 text-neon-cyan animate-spin mx-auto mb-2" />
+                <p className="text-neon-cyan text-xs font-bold animate-pulse uppercase italic">
+                  &gt; ESPERANDO QUE EL ANFITRIÓN REVELE EL SHOCK...
+                </p>
+              </div>
+            )}
+          </div>
+        </ScreenWrapper>
+
+        {/* Shock Reveal Screen (Full Screen) */}
+        <ScreenWrapper isVisible={screen === "shock_reveal"}>
+          <div className="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center p-6 text-center overflow-hidden">
+            {/* Background Glitch Effect */}
+            <div className="absolute inset-0 opacity-20 pointer-events-none">
+              <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] animate-pulse" />
+              <div className="absolute inset-0 bg-gradient-to-t from-neon-pink/20 via-transparent to-neon-cyan/20" />
+            </div>
+
+            <div className="relative z-10 max-w-3xl animate-in fade-in zoom-in duration-700">
+              <div className={`inline-block px-4 py-1 mb-6 text-[12px] font-black uppercase tracking-[0.3em] bg-white text-black`}>
+                ALERTA DE DISRUPCIÓN: {currentDisruption?.tag}
+              </div>
+              
+              <h1 className="text-4xl md:text-6xl font-black text-white italic mb-8 uppercase leading-[0.9] tracking-tighter cyberpunk">
+                {currentDisruption?.titulo}
+              </h1>
+
+              <div className="flex items-center justify-center gap-4 mb-12">
+                <div className="h-[2px] w-12 bg-neon-cyan" />
+                <p className="text-neon-cyan font-black text-sm uppercase tracking-widest italic">
+                  {currentDisruption?.sub}
+                </p>
+                <div className="h-[2px] w-12 bg-neon-cyan" />
+              </div>
+
+              <div className="text-neon-yellow text-xs font-bold animate-pulse uppercase tracking-widest">
+                &gt; PREPARANDO INTERFAZ DE DECISIÓN...
+              </div>
+            </div>
+
+            {/* Scanning Line */}
+            <div className="absolute top-0 left-0 w-full h-[2px] bg-neon-cyan/50 shadow-[0_0_15px_rgba(0,243,255,0.8)] animate-[scan_3s_linear_infinite]" />
+          </div>
         </ScreenWrapper>
 
         {/* Playing Screen */}
         <ScreenWrapper isVisible={screen === "playing"}>
-          <ProgressBar step={3} totalSteps={5} label="Paso 3 de 5 · Toma de decisiones" />
+          <ProgressBar step={3} totalSteps={6} label="Paso 3 de 6 · Toma de decisiones" />
           
           <div className="mb-6 p-4 border-2 border-neon-pink bg-neon-pink/5">
             <span className="text-[9px] text-neon-pink font-bold uppercase tracking-widest block mb-1">ESCENARIO ACTUAL</span>
@@ -453,7 +546,7 @@ export default function App() {
 
         {/* Revealing Screen */}
         <ScreenWrapper isVisible={screen === "revealing"}>
-          <ProgressBar step={4} totalSteps={5} label="Paso 4 de 5 · Revelación" />
+          <ProgressBar step={4} totalSteps={6} label="Paso 4 de 6 · Revelación" />
           
           <div className="text-center mb-8">
             <span className="text-[10px] text-neon-pink uppercase tracking-widest font-bold mb-1 block">RESILIENCIA COLECTIVA</span>
@@ -496,7 +589,7 @@ export default function App() {
 
         {/* Finished Screen */}
         <ScreenWrapper isVisible={screen === "finished"}>
-          <ProgressBar step={5} totalSteps={5} label="PROTOCOLO FINALIZADO" />
+          <ProgressBar step={6} totalSteps={6} label="PROTOCOLO FINALIZADO" />
           
           <div className="flex-1 flex flex-col justify-center">
             <div className="text-center mb-10">
