@@ -17,14 +17,6 @@ service cloud.firestore {
     // ===============================================================
 
     // Helper Functions
-    function isAuthenticated() {
-      return request.auth != null;
-    }
-
-    function isPlayerInSession(sessionId) {
-      return isAuthenticated() && (request.auth.uid in get(/databases/$(database)/documents/sessions/$(sessionId)).data.players);
-    }
-
     function isValidSession(data) {
       return data.status in ['waiting', 'selecting_shock', 'playing', 'revealing', 'finished'] &&
              data.players is map &&
@@ -32,21 +24,8 @@ service cloud.firestore {
     }
 
     match /sessions/{sessionId} {
-      // Allow any authenticated user to read sessions (to join)
-      allow read: if isAuthenticated();
-      
-      // Allow creation of a new session
-      allow create: if isAuthenticated() && 
-                    isValidSession(request.resource.data) &&
-                    request.resource.data.players.keys().size() == 1 &&
-                    request.resource.data.players.keys().hasAll([request.auth.uid]);
-
-      // Allow updates if the user is a player in the session
-      // For simplicity in this prototype, we allow the update if they are a player
-      // and the session structure remains valid.
-      allow update: if isAuthenticated() && 
-                    isValidSession(request.resource.data) &&
-                    (request.auth.uid in resource.data.players || request.resource.data.players.keys().size() <= 3);
+      // Allow public access to sessions (using the ID as the secret)
+      allow read, create, update: if true;
     }
 
     // Default deny
