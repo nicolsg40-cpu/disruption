@@ -12,7 +12,7 @@ import {
 } from "./constants";
 import { ScreenWrapper, ProgressBar, Button } from "./components/UI";
 import { ChevronLeft, Zap, User, CheckCircle2, Loader2, Volume2, VolumeX, Copy, Check } from "lucide-react";
-import { db, auth, signInAnonymously, onAuthStateChanged, collection, addDoc, updateDoc, onSnapshot, serverTimestamp, doc, getDocFromServer } from "./firebase";
+import { db, auth, signInAnonymously, onAuthStateChanged, collection, addDoc, updateDoc, onSnapshot, serverTimestamp, doc, getDocFromServer, GoogleAuthProvider, signInWithPopup } from "./firebase";
 
 type Screen = "welcome" | "waiting" | "selecting_shock" | "playing" | "revealing" | "finished";
 
@@ -45,7 +45,18 @@ export default function App() {
 
   const retryAuth = () => {
     setError(null);
-    signInAnonymously(auth).catch(err => setError("Error de autenticación: " + err.message));
+    signInWithGoogle();
+  };
+
+  const signInWithGoogle = async () => {
+    try {
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
+      setError(null);
+    } catch (err: any) {
+      console.error("Google Auth error:", err);
+      setError("Error de autenticación con Google: " + err.message);
+    }
   };
 
   // Auth initialization
@@ -55,10 +66,9 @@ export default function App() {
         setPlayerId(user.uid);
         setError(null);
       } else {
-        signInAnonymously(auth).catch(err => {
-          console.error("Auth error:", err);
-          setError("Error de autenticación: " + err.message);
-        });
+        // We don't sign in automatically with Google to avoid popups on load
+        // But we clear the player ID
+        setPlayerId(null);
       }
     });
     return () => unsubscribe();
@@ -282,30 +292,38 @@ export default function App() {
             </p>
             
             <div className="space-y-4">
-              <Button onClick={createSession}>
-                CREAR NUEVA SESIÓN →
-              </Button>
-              
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-neon-cyan/20"></span></div>
-                <div className="relative flex justify-center text-[10px] uppercase font-bold"><span className="bg-[#0d0d0d] px-2 text-neon-cyan/40">O ÚNETE A UNA</span></div>
-              </div>
+              {!playerId ? (
+                <Button onClick={signInWithGoogle} className="bg-white text-bg-dark hover:bg-neon-cyan">
+                  INICIAR SESIÓN CON GOOGLE →
+                </Button>
+              ) : (
+                <>
+                  <Button onClick={createSession}>
+                    CREAR NUEVA SESIÓN →
+                  </Button>
+                  
+                  <div className="relative">
+                    <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-neon-cyan/20"></span></div>
+                    <div className="relative flex justify-center text-[10px] uppercase font-bold"><span className="bg-[#0d0d0d] px-2 text-neon-cyan/40">O ÚNETE A UNA</span></div>
+                  </div>
 
-              <div className="flex gap-2">
-                <input 
-                  type="text" 
-                  value={joinId}
-                  onChange={(e) => setJoinId(e.target.value)}
-                  placeholder="ID DE SESIÓN"
-                  className="flex-1 bg-surface-dark border border-neon-cyan/30 p-3 text-neon-cyan font-bold placeholder:text-neon-cyan/20 focus:border-neon-cyan outline-none text-sm"
-                />
-                <button 
-                  onClick={() => joinSession(joinId)}
-                  className="bg-neon-cyan text-bg-dark px-4 font-black text-xs uppercase hover:bg-white transition-colors"
-                >
-                  UNIRSE
-                </button>
-              </div>
+                  <div className="flex gap-2">
+                    <input 
+                      type="text" 
+                      value={joinId}
+                      onChange={(e) => setJoinId(e.target.value)}
+                      placeholder="ID DE SESIÓN"
+                      className="flex-1 bg-surface-dark border border-neon-cyan/30 p-3 text-neon-cyan font-bold placeholder:text-neon-cyan/20 focus:border-neon-cyan outline-none text-sm"
+                    />
+                    <button 
+                      onClick={() => joinSession(joinId)}
+                      className="bg-neon-cyan text-bg-dark px-4 font-black text-xs uppercase hover:bg-white transition-colors"
+                    >
+                      UNIRSE
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </ScreenWrapper>
