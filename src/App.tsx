@@ -12,7 +12,7 @@ import {
 } from "./constants";
 import { ScreenWrapper, ProgressBar, Button } from "./components/UI";
 import { ChevronLeft, Zap, User, CheckCircle2, Loader2, Volume2, VolumeX, Copy, Check } from "lucide-react";
-import { db, auth, signInAnonymously, onAuthStateChanged, collection, addDoc, updateDoc, onSnapshot, serverTimestamp, doc, getDocFromServer, GoogleAuthProvider, signInWithPopup } from "./firebase";
+import { db, auth, onAuthStateChanged, collection, addDoc, updateDoc, onSnapshot, serverTimestamp, doc, getDocFromServer, GoogleAuthProvider, signInWithPopup } from "./firebase";
 
 type Screen = "welcome" | "waiting" | "selecting_shock" | "playing" | "revealing" | "finished";
 
@@ -42,6 +42,16 @@ export default function App() {
   const [joinId, setJoinId] = useState("");
   const [copied, setCopied] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  const signOutUser = async () => {
+    try {
+      await auth.signOut();
+      setPlayerId(null);
+      setError(null);
+    } catch (err: any) {
+      setError("Error al cerrar sesión: " + err.message);
+    }
+  };
 
   const retryAuth = () => {
     setError(null);
@@ -268,8 +278,11 @@ export default function App() {
             <div className="flex justify-between items-start">
               <span>&gt; ERROR: {error}</span>
               <div className="flex gap-3">
-                {error.includes("autenticación") && (
-                  <button onClick={retryAuth} className="underline hover:text-white transition-colors">Reintentar</button>
+                {error.toLowerCase().includes("autenticación") && (
+                  <>
+                    <button onClick={retryAuth} className="underline hover:text-white transition-colors">Reintentar</button>
+                    <button onClick={signOutUser} className="underline hover:text-white transition-colors">Cerrar Sesión</button>
+                  </>
                 )}
                 <button onClick={() => setError(null)} className="underline hover:text-white transition-colors">Cerrar</button>
               </div>
@@ -287,7 +300,7 @@ export default function App() {
               HACKEA LA<br /><span className="text-neon-yellow">DISRUPCIÓN</span>
             </h1>
             <p className="cyberpunk leading-relaxed mb-8 border-l-4 border-neon-pink bg-surface-dark/50 p-2">
-              El futuro del trabajo ya llegó — y no pidió permiso.<br /><br />
+              ¿La transformación digital te deja atrás?<br /><br />
               Reúne a <span className="text-neon-yellow font-bold underline">3 personas</span> para enfrentar una crisis digital desde distintos roles.
             </p>
             

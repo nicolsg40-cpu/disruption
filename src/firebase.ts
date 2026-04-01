@@ -1,6 +1,6 @@
 console.log("firebase.ts: module load");
 import { initializeApp } from 'firebase/app';
-import { getAuth, signInAnonymously, onAuthStateChanged, User, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { getAuth, onAuthStateChanged, User, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { getFirestore, getDocFromServer, doc, collection, addDoc, updateDoc, onSnapshot, serverTimestamp, query, where, getDocs, deleteDoc, setDoc } from 'firebase/firestore';
 
 // Import the Firebase configuration
@@ -11,5 +11,5 @@ const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
 export const auth = getAuth();
 
-export { signInAnonymously, onAuthStateChanged, collection, addDoc, updateDoc, onSnapshot, serverTimestamp, query, where, getDocs, deleteDoc, setDoc, doc, getDocFromServer, GoogleAuthProvider, signInWithPopup };
+export { onAuthStateChanged, collection, addDoc, updateDoc, onSnapshot, serverTimestamp, query, where, getDocs, deleteDoc, setDoc, doc, getDocFromServer, GoogleAuthProvider, signInWithPopup };
 export type { User };
