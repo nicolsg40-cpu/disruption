@@ -43,13 +43,22 @@ export default function App() {
   const [copied, setCopied] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
+  const retryAuth = () => {
+    setError(null);
+    signInAnonymously(auth).catch(err => setError("Error de autenticación: " + err.message));
+  };
+
   // Auth initialization
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         setPlayerId(user.uid);
+        setError(null);
       } else {
-        signInAnonymously(auth).catch(err => setError("Error de autenticación: " + err.message));
+        signInAnonymously(auth).catch(err => {
+          console.error("Auth error:", err);
+          setError("Error de autenticación: " + err.message);
+        });
       }
     });
     return () => unsubscribe();
@@ -246,8 +255,15 @@ export default function App() {
         
         {error && (
           <div className="absolute top-20 left-4 right-4 z-50 bg-neon-pink/20 border border-neon-pink p-3 text-neon-pink text-xs font-bold uppercase animate-in fade-in slide-in-from-top-2">
-            &gt; ERROR: {error}
-            <button onClick={() => setError(null)} className="float-right underline">Cerrar</button>
+            <div className="flex justify-between items-start">
+              <span>&gt; ERROR: {error}</span>
+              <div className="flex gap-3">
+                {error.includes("autenticación") && (
+                  <button onClick={retryAuth} className="underline hover:text-white transition-colors">Reintentar</button>
+                )}
+                <button onClick={() => setError(null)} className="underline hover:text-white transition-colors">Cerrar</button>
+              </div>
+            </div>
           </div>
         )}
 
