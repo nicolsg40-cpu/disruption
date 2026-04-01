@@ -65,7 +65,11 @@ export default function App() {
       setError(null);
     } catch (err: any) {
       console.error("Google Auth error:", err);
-      setError("Error de autenticación con Google: " + err.message);
+      if (err.code === 'auth/unauthorized-domain') {
+        setError("Dominio no autorizado. Por favor, agrega '" + window.location.hostname + "' a los dominios autorizados en tu consola de Firebase.");
+      } else {
+        setError("Error de autenticación con Google: " + err.message);
+      }
     }
   };
 
