@@ -26,6 +26,7 @@ interface PlayerState {
 interface Session {
   id: string;
   status: "waiting" | "selecting_shock" | "playing" | "revealing" | "finished";
+  hostId: string;
   shockId?: number;
   players: Record<string, PlayerState>;
   score?: number;
@@ -86,6 +87,7 @@ export default function App() {
     try {
       const docRef = await addDoc(collection(db, "sessions"), {
         status: "waiting",
+        hostId: playerId,
         players: {
           [playerId]: {
             name: `Jugador 1`,
@@ -96,7 +98,7 @@ export default function App() {
         createdAt: serverTimestamp()
       });
       setSessionId(docRef.id);
-    } catch (err) {
+    } catch (err: any) {
       setError("Error al crear sesión: " + err.message);
     }
   };
@@ -223,7 +225,23 @@ export default function App() {
 
   const playerState = playerId && session ? session.players[playerId] : null;
   const currentDisruption = session?.shockId ? DISRUPCIONES[session.shockId] : null;
-  const isHost = session && Object.keys(session.players)[0] === playerId;
+  
+  // Robust host detection: use hostId or fallback to the first player in the list
+  const isHost = session && (
+    session.hostId === playerId || 
+    Object.keys(session.players)[0] === playerId
+  );
+
+  // Auto-start game when 3 players join
+  useEffect(() => {
+    if (isHost && session?.status === "waiting" && Object.keys(session.players).length === 3) {
+      console.log("3 players detected, auto-starting...");
+      const timer = setTimeout(() => {
+        startShockSelection();
+      }, 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [session?.players, session?.status, isHost, sessionId]);
 
   const toggleMute = () => setIsMuted(!isMuted);
 
@@ -327,9 +345,14 @@ export default function App() {
             </div>
 
             {isHost && Object.keys(session?.players || {}).length === 3 && (
-              <Button onClick={startShockSelection} className="animate-bounce">
-                INICIAR JUEGO →
-              </Button>
+              <div className="space-y-4 w-full">
+                <div className="text-neon-yellow text-[10px] font-bold animate-pulse mb-2 uppercase tracking-tighter">
+                  &gt; TODOS LOS JUGADORES CONECTADOS. INICIANDO...
+                </div>
+                <Button onClick={startShockSelection} className="shadow-[0_0_20px_rgba(255,255,0,0.3)]">
+                  INICIAR PROTOCOLO AHORA →
+                </Button>
+              </div>
             )}
             {!isHost && Object.keys(session?.players || {}).length === 3 && (
               <p className="text-neon-yellow text-xs font-bold animate-pulse italic">
