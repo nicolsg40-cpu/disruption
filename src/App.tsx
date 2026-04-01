@@ -42,6 +42,7 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const [joinId, setJoinId] = useState("");
   const [copied, setCopied] = useState(false);
+  const [showInstructions, setShowInstructions] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // Local Player ID initialization
@@ -359,8 +360,82 @@ export default function App() {
                   UNIRSE
                 </button>
               </div>
+
+              <button 
+                onClick={() => setShowInstructions(true)}
+                className="w-full py-3 text-[10px] font-black uppercase tracking-[0.2em] text-neon-cyan/60 hover:text-neon-cyan transition-colors border border-neon-cyan/10 hover:border-neon-cyan/30 mt-4"
+              >
+                [ CÓMO JUGAR ]
+              </button>
+
+              <div className="mt-12 text-center opacity-30">
+                <p className="text-[8px] font-bold uppercase tracking-[0.2em] text-neon-cyan leading-loose">
+                  Inspirado por ITC - ILO & Panopticon<br />
+                  Todos los derechos reservados
+                </p>
+              </div>
             </div>
           </div>
+
+          {/* Instructions Overlay */}
+          {showInstructions && (
+            <div className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl p-8 flex flex-col animate-in fade-in zoom-in duration-300">
+              <div className="flex justify-between items-center mb-8">
+                <h3 className="text-2xl font-black cyberpunk italic text-neon-yellow uppercase">PROTOCOLO DE JUEGO</h3>
+                <button onClick={() => setShowInstructions(false)} className="text-neon-pink hover:text-white transition-colors">
+                  <ChevronLeft size={32} />
+                </button>
+              </div>
+
+              <div className="flex-1 overflow-y-auto space-y-8 pr-2">
+                <section>
+                  <div className="text-neon-cyan text-[10px] font-black uppercase mb-2 tracking-widest">01. EL EQUIPO</div>
+                  <p className="text-sm text-white/80 leading-relaxed italic">
+                    Este es un juego para <span className="text-neon-yellow font-bold">3 jugadores</span>. Cada uno debe conectarse desde su propio dispositivo usando el mismo ID de sesión.
+                  </p>
+                </section>
+
+                <section>
+                  <div className="text-neon-cyan text-[10px] font-black uppercase mb-2 tracking-widest">02. IDENTIDAD ASIGNADA</div>
+                  <p className="text-sm text-white/80 leading-relaxed italic">
+                    Al iniciar, el sistema te asignará un <span className="text-neon-yellow font-bold">Rol</span> (Empleado, Emprendedor, Funcionario, etc.). Deberás tomar decisiones pensando en los intereses y valores de ese rol.
+                  </p>
+                </section>
+
+                <section>
+                  <div className="text-neon-cyan text-[10px] font-black uppercase mb-2 tracking-widest">03. EL SHOCK</div>
+                  <p className="text-sm text-white/80 leading-relaxed italic">
+                    Una crisis digital aleatoria golpeará el sistema. Lee atentamente la disrupción y prepárate para actuar.
+                  </p>
+                </section>
+
+                <section>
+                  <div className="text-neon-cyan text-[10px] font-black uppercase mb-2 tracking-widest">04. DECISIÓN CRÍTICA</div>
+                  <p className="text-sm text-white/80 leading-relaxed italic">
+                    Tendrás 3 opciones. Tu elección afectará la <span className="text-neon-yellow font-bold">Resiliencia Colectiva</span>. ¿Priorizarás el bien común o tu propio sector?
+                  </p>
+                </section>
+
+                <section>
+                  <div className="text-neon-cyan text-[10px] font-black uppercase mb-2 tracking-widest">05. REVELACIÓN</div>
+                  <p className="text-sm text-white/80 leading-relaxed italic">
+                    Al final, verás cómo las decisiones del grupo impactaron el sistema y conocerás un <span className="text-neon-yellow font-bold">caso real</span> similar al shock que enfrentaste.
+                  </p>
+                </section>
+              </div>
+
+              <Button onClick={() => setShowInstructions(false)} className="mt-8">
+                ENTENDIDO, VOLVER →
+              </Button>
+
+              <div className="mt-8 pt-6 border-t border-neon-cyan/10 text-center">
+                <p className="text-[9px] text-neon-cyan/40 font-bold uppercase tracking-widest leading-relaxed">
+                  Inspirado en el trabajo de <span className="text-neon-cyan/60">ITC - ILO</span> y <span className="text-neon-cyan/60">Panopticon</span><br />
+                  © Todos los derechos reservados
+                </p>
+              </div>
+            </div>
+          )}
         </ScreenWrapper>
 
         {/* Waiting Screen */}
@@ -633,6 +708,13 @@ export default function App() {
           <Button variant="secondary" onClick={reset}>
             VOLVER AL INICIO
           </Button>
+
+          <div className="mt-8 text-center opacity-40">
+            <p className="text-[9px] font-black uppercase tracking-widest text-neon-cyan">
+              Inspirado en ITC - ILO y Panopticon<br />
+              © Todos los derechos reservados
+            </p>
+          </div>
         </ScreenWrapper>
 
       </div>
