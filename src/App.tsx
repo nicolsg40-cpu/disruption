@@ -27,6 +27,7 @@ interface Session {
   id: string;
   status: "waiting" | "assigning_roles" | "shock_reveal" | "playing" | "revealing" | "finished";
   hostId: string;
+  mode: "solo" | "multi";
   shockId?: number;
   players: Record<string, PlayerState>;
   score?: number;
@@ -83,42 +84,28 @@ export default function App() {
     return () => unsubscribe();
   }, [sessionId]);
 
-  // Session synchronization
-  useEffect(() => {
-    if (!sessionId) return;
-
-    const unsubscribe = onSnapshot(doc(db, "sessions", sessionId), (docSnap) => {
-      if (docSnap.exists()) {
-        const data = docSnap.data() as Omit<Session, 'id'>;
-        setSession({ id: docSnap.id, ...data });
-        
-        // Update screen based on session status
-        if (data.status === "waiting") setScreen("waiting");
-        else if (data.status === "assigning_roles") setScreen("assigning_roles");
-        else if (data.status === "shock_reveal") setScreen("shock_reveal");
-        else if (data.status === "playing") setScreen("playing");
-        else if (data.status === "revealing") setScreen("revealing");
-        else if (data.status === "finished") setScreen("finished");
-      }
-    });
-
-    return () => unsubscribe();
-  }, [sessionId]);
-
-  const createSession = async () => {
+  const createSession = async (mode: "solo" | "multi" = "multi") => {
     if (!playerId) return;
     setError(null);
     try {
+      const initialPlayers: Record<string, PlayerState> = {
+        [playerId]: {
+          name: `Jugador 1`,
+          isReady: false,
+          roleId: ""
+        }
+      };
+
+      if (mode === "solo") {
+        initialPlayers["ai_1"] = { name: "AGENTE_ALPHA", isReady: true, roleId: "" };
+        initialPlayers["ai_2"] = { name: "AGENTE_BETA", isReady: true, roleId: "" };
+      }
+
       const docRef = await addDoc(collection(db, "sessions"), {
         status: "waiting",
         hostId: playerId,
-        players: {
-          [playerId]: {
-            name: `Jugador 1`,
-            isReady: false,
-            roleId: ""
-          }
-        },
+        mode: mode,
+        players: initialPlayers,
         createdAt: serverTimestamp()
       });
       setSessionId(docRef.id);
@@ -202,13 +189,23 @@ export default function App() {
   };
 
   const makeChoice = async (choiceIndex: number) => {
-    if (!sessionId || !playerId) return;
+    if (!sessionId || !playerId || !session) return;
     try {
-      await updateDoc(doc(db, "sessions", sessionId), {
+      const updates: any = {
         [`players.${playerId}.choice`]: choiceIndex,
         [`players.${playerId}.isReady`]: true
-      });
-    } catch (err) {
+      };
+
+      if (session.mode === "solo") {
+        // Generate random choices for AI
+        updates["players.ai_1.choice"] = Math.floor(Math.random() * 3);
+        updates["players.ai_1.isReady"] = true;
+        updates["players.ai_2.choice"] = Math.floor(Math.random() * 3);
+        updates["players.ai_2.isReady"] = true;
+      }
+
+      await updateDoc(doc(db, "sessions", sessionId), updates);
+    } catch (err: any) {
       setError("Error al guardar elección: " + err.message);
     }
   };
@@ -266,16 +263,19 @@ export default function App() {
     Object.keys(session.players)[0] === playerId
   );
 
-  // Auto-start game when 3 players join
+  // Auto-start game when 3 players join (or immediately in solo mode)
   useEffect(() => {
-    if (isHost && session?.status === "waiting" && Object.keys(session.players).length === 3) {
-      console.log("3 players detected, auto-assigning roles...");
-      const timer = setTimeout(() => {
-        assignRoles();
-      }, 1500);
-      return () => clearTimeout(timer);
+    if (isHost && session?.status === "waiting") {
+      const playerCount = Object.keys(session.players).length;
+      if (session.mode === "solo" || playerCount === 3) {
+        console.log("Starting protocol...");
+        const timer = setTimeout(() => {
+          assignRoles();
+        }, 1500);
+        return () => clearTimeout(timer);
+      }
     }
-  }, [session?.players, session?.status, isHost, sessionId]);
+  }, [session?.players, session?.status, isHost, sessionId, session?.mode]);
 
   useEffect(() => {
     if (audioRef.current) {
@@ -336,8 +336,12 @@ export default function App() {
             </p>
             
             <div className="space-y-4">
-              <Button onClick={createSession}>
-                CREAR NUEVA SESIÓN →
+              <Button onClick={() => createSession("solo")} className="bg-neon-yellow text-bg-dark hover:bg-white">
+                MODO SOLITARIO (1 JUGADOR) →
+              </Button>
+              
+              <Button onClick={() => createSession("multi")}>
+                MODO MULTIJUGADOR (3 JUGADORES) →
               </Button>
               
               <div className="relative">
@@ -391,7 +395,7 @@ export default function App() {
                 <section>
                   <div className="text-neon-cyan text-[10px] font-black uppercase mb-2 tracking-widest">01. EL EQUIPO</div>
                   <p className="text-sm text-white/80 leading-relaxed italic">
-                    Este es un juego para <span className="text-neon-yellow font-bold">3 jugadores</span>. Cada uno debe conectarse desde su propio dispositivo usando el mismo ID de sesión.
+                    Este es un juego para <span className="text-neon-yellow font-bold">3 participantes</span>. Puedes jugar en <span className="text-neon-yellow font-bold">Modo Solitario</span> (con agentes IA) o en <span className="text-neon-yellow font-bold">Modo Multijugador</span> conectando 3 dispositivos al mismo ID.
                   </p>
                 </section>
 
@@ -440,7 +444,7 @@ export default function App() {
 
         {/* Waiting Screen */}
         <ScreenWrapper isVisible={screen === "waiting"}>
-          <ProgressBar step={1} totalSteps={6} label="Esperando jugadores..." />
+          <ProgressBar step={1} totalSteps={6} label={session?.mode === "solo" ? "Inicializando agentes..." : "Esperando jugadores..."} />
           <div className="flex-1 flex flex-col justify-center text-center">
             <div className="mb-8">
               <div className="text-[10px] text-neon-cyan uppercase font-bold mb-2">ID DE SESIÓN</div>
@@ -448,7 +452,9 @@ export default function App() {
                 <code className="text-xl font-black text-neon-yellow tracking-widest">{sessionId}</code>
                 {copied ? <Check size={18} className="text-neon-cyan" /> : <Copy size={18} className="text-neon-cyan/40 group-hover:text-neon-cyan" />}
               </div>
-              <p className="text-[10px] text-neon-cyan/40 mt-2">Comparte este ID con los otros 2 jugadores</p>
+              <p className="text-[10px] text-neon-cyan/40 mt-2">
+                {session?.mode === "solo" ? "Protocolo individual activado" : "Comparte este ID con los otros 2 jugadores"}
+              </p>
             </div>
 
             <div className="space-y-4 mb-8">
@@ -473,7 +479,7 @@ export default function App() {
             {isHost && Object.keys(session?.players || {}).length === 3 && (
               <div className="space-y-4 w-full">
                 <div className="text-neon-yellow text-[10px] font-bold animate-pulse mb-2 uppercase tracking-tighter">
-                  &gt; TODOS LOS JUGADORES CONECTADOS. INICIANDO...
+                  &gt; {session?.mode === "solo" ? "AGENTES LISTOS. INICIANDO..." : "TODOS LOS JUGADORES CONECTADOS. INICIANDO..."}
                 </div>
                 <Button onClick={assignRoles} className="shadow-[0_0_20px_rgba(255,255,0,0.3)]">
                   INICIAR PROTOCOLO AHORA →
