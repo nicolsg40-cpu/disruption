@@ -11,13 +11,21 @@ import {
   SOLO_AVATARS,
   SOLO_ACCIONES,
   HORIZONTES,
+  ELEMENTOS,
+  SINERGIAS,
+  CONFLICTOS,
+  FUTUROS,
   type Disruption,
+  type Futuro,
+  type Elemento,
+  type ComponenteIniciativa,
 } from "./constants";
 import { ScreenWrapper, ProgressBar, Button } from "./components/UI";
 import { ChevronLeft, Zap, User, CheckCircle2, Loader2, Volume2, VolumeX, Copy, Check } from "lucide-react";
 import { db, collection, addDoc, updateDoc, onSnapshot, serverTimestamp, doc, getDocFromServer } from "./firebase";
 
-type Screen = "welcome" | "waiting" | "selecting_avatar" | "assigning_roles" | "shock_reveal" | "playing" | "revealing" | "finished";
+type Screen = "welcome" | "waiting" | "selecting_avatar" | "assigning_roles" | "shock_reveal" | "playing" | "revealing" | "finished" | 
+              "level2_intro" | "level2_investment" | "level2_result" | "level2_initiative" | "level2_evaluation";
 
 interface PlayerState {
   roleId: string;
@@ -44,6 +52,9 @@ export default function App() {
   const [playerId, setPlayerId] = useState<string | null>(null);
   const [isMuted, setIsMuted] = useState(false);
   const [soloHorizonId, setSoloHorizonId] = useState<number | null>(null);
+  const [level2Investments, setLevel2Investments] = useState<Record<number, number>>({});
+  const [level2Future, setLevel2Future] = useState<Futuro | null>(null);
+  const [level2SelectedComponents, setLevel2SelectedComponents] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [joinId, setJoinId] = useState("");
   const [copied, setCopied] = useState(false);
@@ -285,6 +296,9 @@ export default function App() {
     setSession(null);
     setScreen("welcome");
     setJoinId("");
+    setLevel2Investments({});
+    setLevel2Future(null);
+    setLevel2SelectedComponents([]);
   };
 
   const copyId = () => {
@@ -332,8 +346,62 @@ export default function App() {
 
   const toggleMute = () => setIsMuted(!isMuted);
 
+  const calculateLevel2Future = () => {
+    let scores = { F1: 0, F2: 0, F3: 0 };
+
+    // Base affinity
+    ELEMENTOS.forEach(el => {
+      const points = level2Investments[el.id] || 0;
+      scores.F1 += el.f1 * points;
+      scores.F2 += el.f2 * points;
+      scores.F3 += el.f3 * points;
+    });
+
+    // Synergies
+    SINERGIAS.forEach(s => {
+      if ((level2Investments[s.a] || 0) > 0 && (level2Investments[s.b] || 0) > 0) {
+        if (s.futuro === "F2F3") {
+          scores.F2 += s.bono;
+          scores.F3 += s.bono;
+        } else {
+          scores[s.futuro] += s.bono;
+        }
+      }
+    });
+
+    // Conflicts
+    CONFLICTOS.forEach(c => {
+      if (c.condA(level2Investments[c.a] || 0) && c.condB(level2Investments[c.b] || 0)) {
+        scores[c.futuro] += c.penaliza;
+      }
+    });
+
+    // Determine winner
+    let winner: "F1" | "F2" | "F3" = "F1";
+    if (scores.F2 > scores[winner]) winner = "F2";
+    if (scores.F3 > scores[winner]) winner = "F3";
+    // Priority F1 > F2 > F3 is handled by the order of checks if equal
+
+    setLevel2Future(FUTUROS[winner]);
+    setScreen("level2_result");
+  };
+
+  const totalInvestmentPoints = (Object.values(level2Investments) as number[]).reduce((acc: number, val: number) => acc + val, 0);
+  const totalInvestmentCost = ELEMENTOS.reduce((acc: number, el) => acc + (level2Investments[el.id] || 0) * el.costo, 0);
+
   return (
     <div className="min-h-screen bg-[#050505] flex justify-center items-start overflow-x-hidden font-['Advent_Pro'] relative text-white">
+      {/* Cybertropical Background Elements */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden opacity-20">
+        <div className="absolute -top-20 -left-20 w-96 h-96 bg-neon-cyan/20 rounded-full blur-[100px]" />
+        <div className="absolute top-1/2 -right-20 w-80 h-80 bg-neon-pink/20 rounded-full blur-[100px]" />
+        <div className="absolute -bottom-20 left-1/4 w-96 h-96 bg-neon-yellow/10 rounded-full blur-[100px]" />
+        
+        {/* Abstract tropical leaves (simplified with CSS) */}
+        <div className="absolute top-10 left-10 w-40 h-80 border-l-4 border-neon-cyan/30 rounded-full rotate-45 transform skew-x-12" />
+        <div className="absolute bottom-20 right-10 w-60 h-40 border-b-4 border-neon-pink/30 rounded-full -rotate-12 transform skew-y-6" />
+      </div>
+
       <audio 
         ref={audioRef} 
         src={screen === "welcome" ? "https://cdn.pixabay.com/audio/2022/03/10/audio_c8c8a73456.mp3" : "https://cdn.pixabay.com/audio/2022/03/24/audio_7e641e19d9.mp3"} 
@@ -361,6 +429,215 @@ export default function App() {
           </div>
         )}
 
+        {/* Level 2 Intro Screen */}
+        <ScreenWrapper isVisible={screen === "level2_intro"}>
+          <div className="flex-1 flex flex-col justify-center relative">
+            {/* Tropical accent image */}
+            <div className="absolute -top-10 -right-10 w-32 h-32 opacity-30 rotate-12">
+              <img src="https://picsum.photos/seed/tropical-leaf/200/200" alt="Leaf" className="w-full h-full object-contain filter hue-rotate-90" referrerPolicy="no-referrer" />
+            </div>
+
+            <span className="text-[10px] text-neon-yellow tracking-[0.3em] uppercase font-bold mb-4 animate-pulse">
+              [ PROTOCOLO NIVEL 2 ]
+            </span>
+            <h1 className="text-5xl font-black leading-none mb-6 cyberpunk italic text-white">
+              CONSTRUYE EL<br /><span className="text-neon-cyan drop-shadow-[0_0_10px_rgba(0,243,255,0.5)]">PAÍS 2077</span>
+            </h1>
+            <div className="space-y-4 mb-8 text-sm leading-relaxed italic text-white/80 border-l-4 border-neon-yellow bg-gradient-to-r from-neon-yellow/10 to-transparent p-4 backdrop-blur-sm">
+              <p>Tienes <span className="text-neon-yellow font-bold">10 puntos de inversión</span> para diseñar el futuro.</p>
+              <p>¿Cooperativas digitales? ¿Educación con IA? ¿Energías limpias?</p>
+              <p>Tus elecciones activan sinergias, pero también conflictos. El futuro depende de tu estrategia.</p>
+            </div>
+            <Button onClick={() => setScreen("level2_investment")} className="bg-gradient-to-r from-neon-cyan via-neon-pink to-neon-yellow text-bg-dark font-black hover:scale-105 transition-transform">
+              COMENZAR INVERSIÓN →
+            </Button>
+            <button onClick={reset} className="mt-4 text-[10px] text-white/40 uppercase font-bold hover:text-white transition-colors">
+              VOLVER AL INICIO
+            </button>
+          </div>
+        </ScreenWrapper>
+
+        {/* Level 2 Investment Screen */}
+        <ScreenWrapper isVisible={screen === "level2_investment"}>
+          <ProgressBar step={1} totalSteps={3} label="FASE DE INVERSIÓN" />
+          
+          <div className="flex justify-between items-end mb-6 bg-surface-dark p-4 border-b-2 border-neon-yellow">
+            <div>
+              <div className="text-[10px] font-black text-neon-yellow uppercase mb-1">PUNTOS DISPONIBLES</div>
+              <div className="text-3xl font-black text-white">{10 - totalInvestmentPoints}</div>
+            </div>
+            <div className="text-right">
+              <div className="text-[10px] font-black text-neon-cyan uppercase mb-1">COSTO TOTAL</div>
+              <div className="text-xl font-black text-white">{totalInvestmentCost} <span className="text-[10px] text-neon-cyan">CRÉDITOS</span></div>
+            </div>
+          </div>
+
+          <div className="flex-1 overflow-y-auto space-y-3 pr-2 mb-6">
+            {ELEMENTOS.map(el => {
+              const points = level2Investments[el.id] || 0;
+              return (
+                <div key={el.id} className={`p-3 border-2 transition-all ${points > 0 ? "border-neon-cyan bg-neon-cyan/5" : "border-white/10 bg-surface-dark/50"}`}>
+                  <div className="flex justify-between items-start mb-2">
+                    <div className="flex-1">
+                      <h4 className="text-xs font-black uppercase text-white leading-tight">{el.nombre}</h4>
+                      <div className="text-[9px] text-neon-cyan font-bold uppercase mt-1">COSTO: {el.costo} PUNTOS</div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button 
+                        onClick={() => {
+                          if (points > 0) {
+                            setLevel2Investments({ ...level2Investments, [el.id]: points - 1 });
+                          }
+                        }}
+                        className="w-6 h-6 flex items-center justify-center bg-white/10 hover:bg-neon-pink text-white transition-colors"
+                      >
+                        -
+                      </button>
+                      <span className="w-4 text-center font-black text-neon-yellow">{points}</span>
+                      <button 
+                        onClick={() => {
+                          if (points < 3 && totalInvestmentPoints < 10) {
+                            setLevel2Investments({ ...level2Investments, [el.id]: points + 1 });
+                          }
+                        }}
+                        className="w-6 h-6 flex items-center justify-center bg-white/10 hover:bg-neon-cyan text-white transition-colors"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          <Button 
+            disabled={totalInvestmentPoints === 0}
+            onClick={calculateLevel2Future}
+            className={totalInvestmentPoints === 10 ? "shadow-[0_0_20px_rgba(0,243,255,0.5)]" : "opacity-50"}
+          >
+            GENERAR FUTURO →
+          </Button>
+        </ScreenWrapper>
+
+        {/* Level 2 Result Screen */}
+        <ScreenWrapper isVisible={screen === "level2_result"}>
+          <ProgressBar step={2} totalSteps={3} label="FUTURO DETERMINADO" />
+          
+          <div className="flex-1 flex flex-col justify-center text-center">
+            <div className="mb-8 animate-in fade-in zoom-in duration-1000">
+              <span className="text-[10px] text-neon-pink uppercase tracking-[0.4em] font-black mb-4 block">TU VISIÓN HA CREADO:</span>
+              <h2 className="text-4xl font-black text-white italic cyberpunk uppercase leading-none mb-6">
+                {level2Future?.nombre}
+              </h2>
+              <div className="w-24 h-1 bg-neon-cyan mx-auto mb-6" />
+              <p className="text-sm text-white/80 leading-relaxed italic bg-surface-dark p-6 border-2 border-neon-cyan shadow-[0_0_20px_rgba(0,243,255,0.2)]">
+                {level2Future?.descripcion}
+              </p>
+            </div>
+
+            <Button onClick={() => setScreen("level2_initiative")}>
+              DEFINIR INICIATIVA →
+            </Button>
+          </div>
+        </ScreenWrapper>
+
+        {/* Level 2 Initiative Screen */}
+        <ScreenWrapper isVisible={screen === "level2_initiative"}>
+          <ProgressBar step={2} totalSteps={3} label="DISEÑO DE INICIATIVA" />
+          
+          <div className="mb-6">
+            <h3 className="text-sm font-black text-neon-yellow uppercase tracking-widest mb-1">SELECCIONA 3 COMPONENTES</h3>
+            <p className="text-[10px] text-white/40 uppercase font-bold italic">Define el impacto real de tu visión</p>
+          </div>
+
+          <div className="flex-1 space-y-3 mb-8">
+            {level2Future?.componentes.map(comp => {
+              const isSelected = level2SelectedComponents.includes(comp.id);
+              return (
+                <button
+                  key={comp.id}
+                  onClick={() => {
+                    if (isSelected) {
+                      setLevel2SelectedComponents(level2SelectedComponents.filter(id => id !== comp.id));
+                    } else if (level2SelectedComponents.length < 3) {
+                      setLevel2SelectedComponents([...level2SelectedComponents, comp.id]);
+                    }
+                  }}
+                  className={`w-full p-4 text-left border-2 transition-all relative group ${
+                    isSelected ? "border-neon-pink bg-neon-pink/10" : "border-white/10 bg-surface-dark/50 hover:border-white/30"
+                  }`}
+                >
+                  <div className="flex justify-between items-center">
+                    <span className={`text-xs font-black uppercase italic ${isSelected ? "text-white" : "text-white/60"}`}>
+                      {comp.nombre}
+                    </span>
+                    {isSelected && <CheckCircle2 size={16} className="text-neon-pink" />}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
+          <Button 
+            disabled={level2SelectedComponents.length !== 3}
+            onClick={() => setScreen("level2_evaluation")}
+            className={level2SelectedComponents.length === 3 ? "shadow-[0_0_20px_rgba(255,0,85,0.4)]" : "opacity-50"}
+          >
+            EVALUAR IMPACTO →
+          </Button>
+        </ScreenWrapper>
+
+        {/* Level 2 Evaluation Screen */}
+        <ScreenWrapper isVisible={screen === "level2_evaluation"}>
+          <ProgressBar step={3} totalSteps={3} label="EVALUACIÓN FINAL" />
+          
+          <div className="flex-1 flex flex-col justify-center">
+            {(() => {
+              const totalRelevance = level2SelectedComponents.reduce((acc, id) => {
+                const comp = level2Future?.componentes.find(c => c.id === id);
+                return acc + (comp?.relevancia || 0);
+              }, 0);
+
+              let level = "Básica";
+              let impactDesc = "impacto limitado";
+              if (totalRelevance > 8) {
+                level = "Transformadora";
+                impactDesc = "alto impacto";
+              } else if (totalRelevance >= 6) {
+                level = "Sólida";
+                impactDesc = "buen potencial";
+              }
+
+              return (
+                <div className="text-center">
+                  <div className="mb-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                    <span className="text-[10px] text-neon-cyan uppercase tracking-[0.4em] font-black mb-4 block">TU INICIATIVA ES:</span>
+                    <h2 className={`text-5xl font-black italic cyberpunk uppercase leading-none mb-4 ${
+                      level === "Transformadora" ? "text-neon-yellow" : 
+                      level === "Sólida" ? "text-neon-cyan" : "text-neon-pink"
+                    }`}>
+                      {level}
+                    </h2>
+                    <div className="w-24 h-1 bg-white/20 mx-auto mb-8" />
+                    <p className="text-lg text-white font-bold leading-relaxed italic uppercase tracking-tight">
+                      "Con estos componentes, el impacto en el futuro <span className="text-neon-cyan">{level2Future?.nombre}</span> será <span className="text-neon-yellow underline underline-offset-4 decoration-2">{impactDesc}</span>."
+                    </p>
+                  </div>
+
+                  <div className="bg-surface-dark border-2 border-neon-cyan p-6 mb-10 relative overflow-hidden group">
+                    <div className="absolute top-0 left-0 w-full h-1 bg-neon-cyan animate-pulse" />
+                    <p className="text-xs text-white/60 font-bold mb-4 uppercase italic">¿Construirás un futuro justo o dejarás que otros decidan por ti?</p>
+                    <Button onClick={reset} variant="secondary">
+                      REINICIAR PROTOCOLO
+                    </Button>
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+        </ScreenWrapper>
+
         {/* Welcome Screen */}
         <ScreenWrapper isVisible={screen === "welcome"}>
           <div className="flex-1 flex flex-col justify-center">
@@ -376,11 +653,20 @@ export default function App() {
             </p>
             
             <div className="space-y-4">
-              <Button onClick={() => createSession("solo")} className="bg-neon-yellow text-bg-dark hover:bg-white">
+              <Button onClick={() => setScreen("level2_intro")} className="bg-gradient-to-r from-neon-cyan to-neon-yellow text-bg-dark hover:from-white hover:to-white shadow-[0_0_20px_rgba(0,243,255,0.4)]">
+                NIVEL 2: CONSTRUYE EL 2077 →
+              </Button>
+
+              <div className="relative py-2">
+                <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-neon-cyan/10"></span></div>
+                <div className="relative flex justify-center text-[8px] uppercase font-bold"><span className="bg-[#0d0d0d] px-2 text-neon-cyan/20">O JUEGA EL NIVEL 1</span></div>
+              </div>
+
+              <Button onClick={() => createSession("solo")} className="bg-neon-yellow/10 border-neon-yellow text-neon-yellow hover:bg-neon-yellow hover:text-bg-dark">
                 MODO SOLITARIO (1 JUGADOR) →
               </Button>
               
-              <Button onClick={() => createSession("multi")}>
+              <Button onClick={() => createSession("multi")} variant="secondary">
                 MODO MULTIJUGADOR (3 JUGADORES) →
               </Button>
               

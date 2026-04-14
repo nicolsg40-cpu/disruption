@@ -68,6 +68,119 @@ export const HORIZONTES: Record<number, Horizon> = {
   9: { id: 9, titulo: 'Agotamiento y abandono', descripcion: 'Intentaste actuar, pero la respuesta fue tan desgastante —emocional, económica o físicamente— que decidiste abandonar. Te retiraste del espacio digital, del trabajo o de la participación colectiva. El problema sigue ahí, pero tú ya no tienes energía para enfrentarlo. El silencio y la desconexión son el último recurso de quien fue vencido por el cansancio.', color: 'hack-yellow' },
 };
 
+export interface Elemento {
+  id: number;
+  nombre: string;
+  costo: number;
+  f1: number;
+  f2: number;
+  f3: number;
+}
+
+export const ELEMENTOS: Elemento[] = [
+  { id: 1, nombre: "Cooperativas digitales juveniles", costo: 2, f1: 2, f2: 0, f3: 1 },
+  { id: 2, nombre: "Gobierno juvenil de internet", costo: 2, f1: 2, f2: 0, f3: 0 },
+  { id: 3, nombre: "Protección de datos y privacidad", costo: 1, f1: 2, f2: 0, f3: 1 },
+  { id: 4, nombre: "Seguridad digital colectiva", costo: 1, f1: 2, f2: 0, f3: 1 },
+  { id: 5, nombre: "Ingresos dignos en entorno digital", costo: 1, f1: 2, f2: 0, f3: 1 },
+  { id: 6, nombre: "IA para rutas educativas personalizadas", costo: 2, f1: 0, f2: 2, f3: 0 },
+  { id: 7, nombre: "Aprendizaje basado en problemas reales", costo: 1, f1: 0, f2: 2, f3: 1 },
+  { id: 8, nombre: "Educación continua y reinvención", costo: 1, f1: 0, f2: 2, f3: 0 },
+  { id: 9, nombre: "Conectividad universal territorial", costo: 2, f1: 0, f2: 1, f3: 2 },
+  { id: 10, nombre: "Energías limpias para infraestructura digital", costo: 1, f1: 0, f2: 0, f3: 2 },
+  { id: 11, nombre: "Economías digitales locales", costo: 1, f1: 1, f2: 0, f3: 2 },
+  { id: 12, nombre: "Redes comunitarias autosostenibles", costo: 1, f1: 1, f2: 0, f3: 2 },
+];
+
+export interface Sinergia {
+  id: string;
+  a: number;
+  b: number;
+  bono: number;
+  futuro: "F1" | "F2" | "F3" | "F2F3";
+}
+
+export const SINERGIAS: Sinergia[] = [
+  { id: "S1", a: 1, b: 2, bono: 2, futuro: "F1" },
+  { id: "S2", a: 3, b: 4, bono: 1, futuro: "F1" },
+  { id: "S3", a: 5, b: 11, bono: 1, futuro: "F1" },
+  { id: "S4", a: 6, b: 7, bono: 2, futuro: "F2" },
+  { id: "S5", a: 7, b: 9, bono: 1, futuro: "F2F3" },
+  { id: "S6", a: 10, b: 9, bono: 2, futuro: "F3" },
+  { id: "S7", a: 12, b: 11, bono: 2, futuro: "F3" },
+];
+
+export interface Conflicto {
+  id: string;
+  a: number;
+  b: number;
+  condA: (n: number) => boolean;
+  condB: (n: number) => boolean;
+  penaliza: number;
+  futuro: "F1" | "F2" | "F3";
+}
+
+export const CONFLICTOS: Conflicto[] = [
+  { id: "C1", a: 2, b: 1, condA: (n) => n >= 2, condB: (n) => n >= 2, penaliza: -1, futuro: "F1" },
+  { id: "C2", a: 6, b: 8, condA: (n) => n >= 2, condB: (n) => n >= 2, penaliza: -1, futuro: "F2" },
+  { id: "C3", a: 9, b: 3, condA: (n) => n >= 2, condB: (n) => n === 0, penaliza: -2, futuro: "F1" },
+];
+
+export interface Futuro {
+  id: string;
+  nombre: string;
+  descripcion: string;
+  componentes: ComponenteIniciativa[];
+}
+
+export interface ComponenteIniciativa {
+  id: string;
+  nombre: string;
+  relevancia: number;
+}
+
+export const FUTUROS: Record<string, Futuro> = {
+  F1: {
+    id: "F1",
+    nombre: "Juventudes dueñas de internet",
+    descripcion: "Un futuro donde el control digital vuelve a las manos de quienes lo construyen y habitan.",
+    componentes: [
+      { id: "F1-1", nombre: "Crear una cooperativa digital juvenil nacional", relevancia: 3 },
+      { id: "F1-2", nombre: "Diseñar una ley de protección de datos con control juvenil", relevancia: 3 },
+      { id: "F1-3", nombre: "Implementar sistemas de seguridad digital comunitaria", relevancia: 2 },
+      { id: "F1-4", nombre: "Establecer ingresos mínimos para creadores de contenido jóvenes", relevancia: 2 },
+      { id: "F1-5", nombre: "Formar consejos juveniles de gobernanza de plataformas", relevancia: 3 },
+      { id: "F1-6", nombre: "Desarrollar una app de denuncia de violencias digitales en tiempo real", relevancia: 1 },
+    ],
+  },
+  F2: {
+    id: "F2",
+    nombre: "Educación sin límites ni edades",
+    descripcion: "El conocimiento fluye libremente, potenciado por IA ética y aprendizaje comunitario.",
+    componentes: [
+      { id: "F2-1", nombre: "Crear una plataforma nacional de IA para rutas de aprendizaje personalizadas", relevancia: 3 },
+      { id: "F2-2", nombre: "Impulsar laboratorios de resolución de problemas reales en cada territorio", relevancia: 3 },
+      { id: "F2-3", nombre: "Establecer un sistema de créditos educativos que no caduquen", relevancia: 2 },
+      { id: "F2-4", nombre: "Formar mentores digitales en habilidades del futuro", relevancia: 2 },
+      { id: "F2-5", nombre: "Desarrollar microcredenciales reconocidas por el sector productivo", relevancia: 3 },
+      { id: "F2-6", nombre: "Construir una red de aprendizaje entre pares sin aulas", relevancia: 1 },
+    ],
+  },
+  F3: {
+    id: "F3",
+    nombre: "Territorios vivos y conectados",
+    descripcion: "La brecha digital se cierra con infraestructura verde y soberanía energética.",
+    componentes: [
+      { id: "F3-1", nombre: "Llevar internet satelital gratuito a 500 veredas apartadas", relevancia: 3 },
+      { id: "F3-2", nombre: "Instalar paneles solares en torres de telecomunicaciones rurales", relevancia: 2 },
+      { id: "F3-3", nombre: "Crear mercados digitales locales para productos de la región", relevancia: 3 },
+      { id: "F3-4", nombre: "Formar brigadas juveniles de mantenimiento de redes comunitarias", relevancia: 2 },
+      { id: "F3-5", nombre: "Impulsar un fondo de emprendimiento digital para no migrantes", relevancia: 3 },
+      { id: "F3-6", nombre: "Mapear colaborativamente las energías renovables disponibles", relevancia: 1 },
+    ],
+  },
+};
+
 export const DISRUPCIONES: Record<number, Disruption> = {
   1: {
     id: 1,
