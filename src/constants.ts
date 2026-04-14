@@ -22,6 +22,52 @@ export const ROLES: Role[] = [
   { id: 'estudiante', name: 'Estudiante', description: 'Buscas oportunidades y un futuro prometedor.' },
 ];
 
+export interface SoloAvatar {
+  id: string;
+  name: string;
+  description: string;
+  image: string;
+}
+
+export const SOLO_AVATARS: SoloAvatar[] = [
+  { id: 'plataforma', name: 'Trabajador de plataforma', description: 'Vives al ritmo del algoritmo y la inmediatez.', image: 'https://picsum.photos/seed/delivery/400/600' },
+  { id: 'junior', name: 'Técnico TIC junior', description: 'Entiendes el código, pero no siempre el sistema.', image: 'https://picsum.photos/seed/tech/400/600' },
+  { id: 'rural', name: 'Joven rural conectado', description: 'Luchas por la señal y por un futuro en tu tierra.', image: 'https://picsum.photos/seed/rural/400/600' },
+  { id: 'funcionario', name: 'Funcionario de regulación', description: 'Buscas el equilibrio entre ley y tecnología.', image: 'https://picsum.photos/seed/law/400/600' },
+];
+
+export interface SoloAction {
+  id: number;
+  titulo: string;
+  sub: string;
+}
+
+export const SOLO_ACCIONES: SoloAction[] = [
+  { id: 1, titulo: 'Actuar colectivamente', sub: 'Coordinarse con otros, construir respuesta conjunta' },
+  { id: 2, titulo: 'Proteger mi posición', sub: 'Resolver el problema individualmente' },
+  { id: 3, titulo: 'Presionar al que manda', sub: 'Exigir que gobierno o empresa resuelva' },
+  { id: 4, titulo: 'No hacer nada', sub: 'Esperar que pase' },
+];
+
+export interface Horizon {
+  id: number;
+  titulo: string;
+  descripcion: string;
+  color: string;
+}
+
+export const HORIZONTES: Record<number, Horizon> = {
+  1: { id: 1, titulo: 'Soberanía Tecnológica', descripcion: 'Tu acción inspiró un movimiento que recuperó el control de la infraestructura. No solo resolvieron el problema, sino que crearon un sistema propio, abierto y resiliente.', color: 'hack-cyan' },
+  2: { id: 2, titulo: 'Colapso Sistémico', descripcion: 'La falta de coordinación y la fragilidad del sistema llevaron a una caída total. Los servicios básicos dejaron de funcionar y la desconfianza se volvió absoluta.', color: 'hack-pink' },
+  3: { id: 3, titulo: 'Fragmentación Social', descripcion: 'Cada grupo se encerró en su propia burbuja. La solución técnica llegó, pero el tejido social quedó roto, con comunidades enfrentadas por recursos escasos.', color: 'hack-yellow' },
+  4: { id: 4, titulo: 'Escalada de conflicto y represión', descripcion: 'Tu acción —o tu intento de presión— generó una respuesta violenta o desproporcionada. En lugar de resolver el problema, la situación escaló: perdiste derechos, recursos o aliados. Los actores con poder respondieron con más control, vigilancia o castigo. El shock inicial se convirtió en una crisis más profunda y difícil de revertir.', color: 'hack-pink' },
+  5: { id: 5, titulo: 'Normalización del riesgo', descripcion: 'No hiciste nada. El tiempo pasó y el problema no desapareció, pero la gente se fue acostumbrando a vivir con él. Lo que antes era una crisis ahora se percibe como “normal”. Sin embargo, los daños silenciosos se acumulan: exclusión, desigualdad, pérdida de confianza. Cuando quieras reaccionar, el sistema ya habrá consolidado esa nueva normalidad injusta.', color: 'hack-yellow' },
+  6: { id: 6, titulo: 'Aprendizaje y resiliencia comunitaria', descripcion: 'No lograste una victoria completa, pero sí construiste lazos, información y pequeñas victorias que fortalecen a tu comunidad. Aprendieron a detectar señales tempranas, a compartir recursos y a tomar decisiones más rápidas entre todos. La resiliencia no evita todos los golpes, pero reduce su impacto. La próxima crisis los encontrará mejor preparados.', color: 'hack-cyan' },
+  7: { id: 7, titulo: 'Victimización secundaria', descripcion: 'Además del shock original, sufriste nuevas consecuencias por no haber actuado a tiempo o por haber confiado en quien no debías. Te culparon, te excluyeron o te estigmatizaron. El sistema —digital o social— no te protegió, sino que profundizó tu vulnerabilidad. Salir de esta situación requiere mucho más esfuerzo que al principio.', color: 'hack-pink' },
+  8: { id: 8, titulo: 'Regulación favorable lograda', descripcion: 'Lograste que el gobierno o la empresa responsable cambiara las reglas. A través de presión organizada, denuncias o mecanismos legales, se establecieron normas claras que protegen derechos, garantizan transparencia o limitan abusos. No resuelve todos los problemas de un día para otro, pero crea un piso de derechos que nadie podrá ignorar fácilmente.', color: 'hack-cyan' },
+  9: { id: 9, titulo: 'Agotamiento y abandono', descripcion: 'Intentaste actuar, pero la respuesta fue tan desgastante —emocional, económica o físicamente— que decidiste abandonar. Te retiraste del espacio digital, del trabajo o de la participación colectiva. El problema sigue ahí, pero tú ya no tienes energía para enfrentarlo. El silencio y la desconexión son el último recurso de quien fue vencido por el cansancio.', color: 'hack-yellow' },
+};
+
 export const DISRUPCIONES: Record<number, Disruption> = {
   1: {
     id: 1,

@@ -8,13 +8,16 @@ import {
   DISRUPCIONES, 
   TITULARES, 
   ROLES,
+  SOLO_AVATARS,
+  SOLO_ACCIONES,
+  HORIZONTES,
   type Disruption,
 } from "./constants";
 import { ScreenWrapper, ProgressBar, Button } from "./components/UI";
 import { ChevronLeft, Zap, User, CheckCircle2, Loader2, Volume2, VolumeX, Copy, Check } from "lucide-react";
 import { db, collection, addDoc, updateDoc, onSnapshot, serverTimestamp, doc, getDocFromServer } from "./firebase";
 
-type Screen = "welcome" | "waiting" | "assigning_roles" | "shock_reveal" | "playing" | "revealing" | "finished";
+type Screen = "welcome" | "waiting" | "selecting_avatar" | "assigning_roles" | "shock_reveal" | "playing" | "revealing" | "finished";
 
 interface PlayerState {
   roleId: string;
@@ -40,6 +43,7 @@ export default function App() {
   const [session, setSession] = useState<Session | null>(null);
   const [playerId, setPlayerId] = useState<string | null>(null);
   const [isMuted, setIsMuted] = useState(false);
+  const [soloHorizonId, setSoloHorizonId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [joinId, setJoinId] = useState("");
   const [copied, setCopied] = useState(false);
@@ -66,12 +70,22 @@ export default function App() {
         setSession({ id: docSnap.id, ...data });
         
         // Update screen based on session status
-        if (data.status === "waiting") setScreen("waiting");
+        if (data.status === "waiting") {
+          if (data.mode === "solo" && !data.players[playerId!]?.roleId) {
+            setScreen("selecting_avatar");
+          } else {
+            setScreen("waiting");
+          }
+        }
         else if (data.status === "assigning_roles") setScreen("assigning_roles");
         else if (data.status === "shock_reveal") setScreen("shock_reveal");
         else if (data.status === "playing") setScreen("playing");
         else if (data.status === "revealing") setScreen("revealing");
         else if (data.status === "finished") setScreen("finished");
+        
+        if (data.score && data.mode === "solo") {
+          setSoloHorizonId(data.score);
+        }
       } else {
         setError("La sesión no existe.");
         setSessionId(null);
@@ -146,21 +160,47 @@ export default function App() {
     }
   };
 
+  const selectAvatar = async (avatarId: string) => {
+    if (!sessionId || !playerId) return;
+    try {
+      await updateDoc(doc(db, "sessions", sessionId), {
+        [`players.${playerId}.roleId`]: avatarId
+      });
+    } catch (err: any) {
+      setError("Error al seleccionar avatar: " + err.message);
+    }
+  };
+
   const assignRoles = async () => {
     if (!sessionId || !session) return;
     const playerIds = Object.keys(session.players);
-    const shuffledRoles = [...ROLES].sort(() => Math.random() - 0.5);
     
     const updates: any = {
       status: "assigning_roles"
     };
 
-    playerIds.forEach((id, index) => {
-      updates[`players.${id}.roleId`] = shuffledRoles[index % shuffledRoles.length].id;
-    });
+    if (session.mode === "solo") {
+      // In solo mode, the user already selected their avatar.
+      // We just need to assign roles to the AI agents.
+      const aiIds = playerIds.filter(id => id.startsWith("ai_"));
+      const availableRoles = ROLES.filter(r => r.id !== session.players[playerId!]?.roleId);
+      aiIds.forEach((id, index) => {
+        updates[`players.${id}.roleId`] = availableRoles[index % availableRoles.length].id;
+      });
+    } else {
+      const shuffledRoles = [...ROLES].sort(() => Math.random() - 0.5);
+      playerIds.forEach((id, index) => {
+        updates[`players.${id}.roleId`] = shuffledRoles[index % shuffledRoles.length].id;
+      });
+    }
 
     try {
       await updateDoc(doc(db, "sessions", sessionId), updates);
+      
+      // If solo mode, auto-transition to shock reveal quickly
+      if (session.mode === "solo") {
+        setTimeout(() => startShockReveal(), 2000);
+      }
     } catch (err) {
       console.error("Error assigning roles:", err);
     }
@@ -197,11 +237,11 @@ export default function App() {
       };
 
       if (session.mode === "solo") {
-        // Generate random choices for AI
-        updates["players.ai_1.choice"] = Math.floor(Math.random() * 3);
-        updates["players.ai_1.isReady"] = true;
-        updates["players.ai_2.choice"] = Math.floor(Math.random() * 3);
-        updates["players.ai_2.isReady"] = true;
+        // In solo mode, the choice directly determines one of the 9 horizons
+        // We'll use a simple mapping or just pick one based on the choice and some randomness
+        const horizonId = (choiceIndex * 2) + Math.floor(Math.random() * 2) + 1;
+        updates["score"] = horizonId; // We reuse the score field for the horizon ID in solo mode
+        updates["status"] = "revealing";
       }
 
       await updateDoc(doc(db, "sessions", sessionId), updates);
@@ -296,7 +336,7 @@ export default function App() {
     <div className="min-h-screen bg-[#050505] flex justify-center items-start overflow-x-hidden font-['Advent_Pro'] relative text-white">
       <audio 
         ref={audioRef} 
-        src="https://cdn.pixabay.com/audio/2022/03/10/audio_c8c8a73456.mp3" 
+        src={screen === "welcome" ? "https://cdn.pixabay.com/audio/2022/03/10/audio_c8c8a73456.mp3" : "https://cdn.pixabay.com/audio/2022/03/24/audio_7e641e19d9.mp3"} 
         loop 
         playsInline 
       />
@@ -442,6 +482,37 @@ export default function App() {
           )}
         </ScreenWrapper>
 
+        {/* Selecting Avatar Screen (Solo Mode) */}
+        <ScreenWrapper isVisible={screen === "selecting_avatar"}>
+          <ProgressBar step={1} totalSteps={6} label="Paso 1 de 6 · Selección de Avatar" />
+          <div className="flex-1 flex flex-col">
+            <h2 className="text-2xl font-black mb-4 cyberpunk italic uppercase tracking-tighter">
+              ELIGE TU IDENTIDAD
+            </h2>
+            <div className="grid grid-cols-2 gap-3 mb-8">
+              {SOLO_AVATARS.map((avatar) => (
+                <button
+                  key={avatar.id}
+                  onClick={() => selectAvatar(avatar.id)}
+                  className="group relative aspect-[2/3] overflow-hidden border-2 border-neon-cyan/30 hover:border-neon-cyan transition-all"
+                >
+                  <img 
+                    src={avatar.image} 
+                    alt={avatar.name} 
+                    className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
+                    referrerPolicy="no-referrer"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80" />
+                  <div className="absolute bottom-0 left-0 right-0 p-3 text-left">
+                    <div className="text-[10px] font-black text-neon-cyan uppercase mb-1">{avatar.name}</div>
+                    <div className="text-[8px] text-white/60 leading-tight line-clamp-2">{avatar.description}</div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </ScreenWrapper>
+
         {/* Waiting Screen */}
         <ScreenWrapper isVisible={screen === "waiting"}>
           <ProgressBar step={1} totalSteps={6} label={session?.mode === "solo" ? "Inicializando agentes..." : "Esperando jugadores..."} />
@@ -539,27 +610,51 @@ export default function App() {
               <div className="absolute inset-0 bg-gradient-to-t from-neon-pink/20 via-transparent to-neon-cyan/20" />
             </div>
 
-            <div className="relative z-10 max-w-3xl animate-in fade-in zoom-in duration-700">
-              <div className={`inline-block px-4 py-1 mb-6 text-[12px] font-black uppercase tracking-[0.3em] bg-white text-black`}>
-                ALERTA DE DISRUPCIÓN: {currentDisruption?.tag}
-              </div>
-              
-              <h1 className="text-4xl md:text-6xl font-black text-white italic mb-8 uppercase leading-[0.9] tracking-tighter cyberpunk">
-                {currentDisruption?.titulo}
-              </h1>
-
-              <div className="flex items-center justify-center gap-4 mb-12">
-                <div className="h-[2px] w-12 bg-neon-cyan" />
-                <p className="text-neon-cyan font-black text-sm uppercase tracking-widest italic">
-                  {currentDisruption?.sub}
+            {session?.mode === "solo" ? (
+              <div className="relative z-10 w-full max-w-lg text-center animate-in fade-in zoom-in duration-700">
+                <div className="mb-8 relative aspect-video overflow-hidden border-4 border-neon-cyan shadow-[0_0_30px_rgba(0,243,255,0.5)]">
+                  <img 
+                    src="https://picsum.photos/seed/cyberpunk-sky/800/450" 
+                    alt="Sky Screen" 
+                    className="w-full h-full object-cover opacity-60"
+                    referrerPolicy="no-referrer"
+                  />
+                  <div className="absolute inset-0 flex flex-col items-center justify-center p-6">
+                    <div className="text-neon-pink text-[10px] font-black uppercase tracking-[0.4em] mb-4 animate-pulse">ALERTA_SISTEMA</div>
+                    <h2 className="text-2xl font-black text-white italic cyberpunk uppercase leading-tight mb-4">
+                      {currentDisruption?.titulo}
+                    </h2>
+                    <div className="w-24 h-1 bg-neon-cyan animate-pulse" />
+                  </div>
+                  <div className="absolute top-0 left-0 w-full h-1 bg-neon-cyan/50 shadow-[0_0_15px_rgba(0,243,255,0.8)] animate-[scan_2s_linear_infinite]" />
+                </div>
+                <p className="text-neon-cyan text-xs font-bold uppercase tracking-widest animate-pulse italic">
+                  &gt; ANALIZANDO IMPACTO EN EL SECTOR...
                 </p>
-                <div className="h-[2px] w-12 bg-neon-cyan" />
               </div>
+            ) : (
+              <div className="relative z-10 max-w-3xl animate-in fade-in zoom-in duration-700">
+                <div className={`inline-block px-4 py-1 mb-6 text-[12px] font-black uppercase tracking-[0.3em] bg-white text-black`}>
+                  ALERTA DE DISRUPCIÓN: {currentDisruption?.tag}
+                </div>
+                
+                <h1 className="text-4xl md:text-6xl font-black text-white italic mb-8 uppercase leading-[0.9] tracking-tighter cyberpunk">
+                  {currentDisruption?.titulo}
+                </h1>
 
-              <div className="text-neon-yellow text-xs font-bold animate-pulse uppercase tracking-widest">
-                &gt; PREPARANDO INTERFAZ DE DECISIÓN...
+                <div className="flex items-center justify-center gap-4 mb-12">
+                  <div className="h-[2px] w-12 bg-neon-cyan" />
+                  <p className="text-neon-cyan font-black text-sm uppercase tracking-widest italic">
+                    {currentDisruption?.sub}
+                  </p>
+                  <div className="h-[2px] w-12 bg-neon-cyan" />
+                </div>
+
+                <div className="text-neon-yellow text-xs font-bold animate-pulse uppercase tracking-widest">
+                  &gt; PREPARANDO INTERFAZ DE DECISIÓN...
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Scanning Line */}
             <div className="absolute top-0 left-0 w-full h-[2px] bg-neon-cyan/50 shadow-[0_0_15px_rgba(0,243,255,0.8)] animate-[scan_3s_linear_infinite]" />
@@ -570,58 +665,120 @@ export default function App() {
         <ScreenWrapper isVisible={screen === "playing"}>
           <ProgressBar step={3} totalSteps={6} label="Paso 3 de 6 · Toma de decisiones" />
           
-          <div className="mb-6 p-4 border-2 border-neon-pink bg-neon-pink/5">
-            <span className="text-[9px] text-neon-pink font-bold uppercase tracking-widest block mb-1">ESCENARIO ACTUAL</span>
-            <h3 className="text-lg font-black text-white italic leading-tight uppercase">{currentDisruption?.titulo}</h3>
-          </div>
-
-          <div className="mb-8 p-5 bg-surface-dark border-l-4 border-neon-yellow relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-1 bg-neon-yellow text-bg-dark text-[8px] font-bold uppercase">TU ROL</div>
-            <h4 className="text-xl font-black text-neon-yellow italic mb-2 uppercase">
-              {ROLES.find(r => r.id === playerState?.roleId)?.name}
-            </h4>
-            <p className="text-xs text-neon-cyan/80 leading-relaxed font-medium">
-              {ROLES.find(r => r.id === playerState?.roleId)?.description}
-            </p>
-          </div>
-
-          <h2 className="text-xl font-bold mb-4 cyberpunk uppercase italic">¿Qué decides hacer?</h2>
-          
-          <div className="space-y-3 mb-8">
-            {currentDisruption?.opciones.map((opt, i) => (
-              <button
-                key={i}
-                onClick={() => makeChoice(i)}
-                disabled={playerState?.choice !== undefined}
-                className={`w-full p-4 text-left border-2 transition-all relative group ${
-                  playerState?.choice === i 
-                    ? "border-neon-cyan bg-neon-cyan/10 text-white" 
-                    : "border-neon-cyan/20 bg-surface-dark text-neon-cyan/60 hover:border-neon-cyan/50"
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <div className={`w-6 h-6 flex items-center justify-center border ${playerState?.choice === i ? "bg-neon-cyan text-bg-dark border-neon-cyan" : "border-neon-cyan/30"}`}>
-                    {i + 1}
-                  </div>
-                  <span className="text-sm font-bold uppercase italic tracking-tight">{opt}</span>
+          {session?.mode === "solo" ? (
+            <div className="flex-1 flex flex-col">
+              {/* Screen in the sky visual */}
+              <div className="relative w-full aspect-video mb-6 overflow-hidden border-2 border-neon-cyan shadow-[0_0_20px_rgba(0,243,255,0.3)] bg-black">
+                <img 
+                  src="https://picsum.photos/seed/cyberpunk-city/800/450" 
+                  alt="Sky Screen" 
+                  className="w-full h-full object-cover opacity-40"
+                  referrerPolicy="no-referrer"
+                />
+                <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center">
+                  <div className="text-[8px] text-neon-pink font-black uppercase tracking-[0.2em] mb-2">TRANSMISIÓN_CRÍTICA</div>
+                  <h3 className="text-sm font-black text-white uppercase italic leading-tight mb-2">
+                    {currentDisruption?.titulo}
+                  </h3>
+                  <div className="w-12 h-[1px] bg-neon-cyan/50" />
                 </div>
-                {playerState?.choice === i && <CheckCircle2 size={16} className="absolute top-2 right-2 text-neon-cyan" />}
-              </button>
-            ))}
-          </div>
+                {/* Scanning line */}
+                <div className="absolute top-0 left-0 w-full h-[1px] bg-neon-cyan/30 shadow-[0_0_10px_rgba(0,243,255,0.5)] animate-[scan_4s_linear_infinite]" />
+              </div>
 
-          {playerState?.choice !== undefined && (
-            <div className="text-center p-6 bg-surface-dark border border-dashed border-neon-cyan/30">
-              <Loader2 className="w-8 h-8 text-neon-cyan animate-spin mx-auto mb-3" />
-              <p className="text-xs font-bold text-neon-cyan uppercase tracking-widest animate-pulse">
-                ESPERANDO A LOS DEMÁS JUGADORES...
-              </p>
-              <div className="flex justify-center gap-2 mt-4">
-                {(Object.values(session?.players || {}) as PlayerState[]).map((p, i) => (
-                  <div key={i} className={`w-2 h-2 ${p.choice !== undefined ? "bg-neon-cyan shadow-[0_0_5px_rgba(0,243,255,0.8)]" : "bg-white/10"}`} />
+              <div className="mb-6 flex items-center gap-4">
+                <div className="w-16 h-16 border border-neon-yellow overflow-hidden flex-shrink-0">
+                  <img 
+                    src={SOLO_AVATARS.find(a => a.id === playerState?.roleId)?.image} 
+                    alt="Avatar" 
+                    className="w-full h-full object-cover"
+                    referrerPolicy="no-referrer"
+                  />
+                </div>
+                <div>
+                  <div className="text-[10px] text-neon-yellow font-black uppercase tracking-widest mb-1">IDENTIDAD ACTIVA</div>
+                  <div className="text-lg font-black text-white italic uppercase">{SOLO_AVATARS.find(a => a.id === playerState?.roleId)?.name}</div>
+                </div>
+              </div>
+
+              <h2 className="text-xl font-bold mb-4 cyberpunk uppercase italic">¿Qué decides hacer?</h2>
+              
+              <div className="space-y-3 mb-8">
+                {SOLO_ACCIONES.map((opt, i) => (
+                  <button
+                    key={i}
+                    onClick={() => makeChoice(i)}
+                    className="w-full p-4 text-left border-2 border-neon-cyan/20 bg-surface-dark text-neon-cyan/60 hover:border-neon-cyan hover:bg-neon-cyan/10 transition-all relative group"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-6 h-6 flex items-center justify-center border border-neon-cyan/30 text-[10px] font-black">
+                        {i + 1}
+                      </div>
+                      <div>
+                        <div className="text-sm font-black uppercase italic tracking-tight text-white group-hover:text-neon-cyan transition-colors">{opt.titulo}</div>
+                        <div className="text-[9px] text-white/40 uppercase font-bold">{opt.sub}</div>
+                      </div>
+                    </div>
+                  </button>
                 ))}
               </div>
             </div>
+          ) : (
+            <>
+              <div className="mb-6 p-4 border-2 border-neon-pink bg-neon-pink/5">
+                <span className="text-[9px] text-neon-pink font-bold uppercase tracking-widest block mb-1">ESCENARIO ACTUAL</span>
+                <h3 className="text-lg font-black text-white italic leading-tight uppercase">{currentDisruption?.titulo}</h3>
+              </div>
+
+              <div className="mb-8 p-5 bg-surface-dark border-l-4 border-neon-yellow relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-1 bg-neon-yellow text-bg-dark text-[8px] font-bold uppercase">TU ROL</div>
+                <h4 className="text-xl font-black text-neon-yellow italic mb-2 uppercase">
+                  {ROLES.find(r => r.id === playerState?.roleId)?.name}
+                </h4>
+                <p className="text-xs text-neon-cyan/80 leading-relaxed font-medium">
+                  {ROLES.find(r => r.id === playerState?.roleId)?.description}
+                </p>
+              </div>
+
+              <h2 className="text-xl font-bold mb-4 cyberpunk uppercase italic">¿Qué decides hacer?</h2>
+              
+              <div className="space-y-3 mb-8">
+                {currentDisruption?.opciones.map((opt, i) => (
+                  <button
+                    key={i}
+                    onClick={() => makeChoice(i)}
+                    disabled={playerState?.choice !== undefined}
+                    className={`w-full p-4 text-left border-2 transition-all relative group ${
+                      playerState?.choice === i 
+                        ? "border-neon-cyan bg-neon-cyan/10 text-white" 
+                        : "border-neon-cyan/20 bg-surface-dark text-neon-cyan/60 hover:border-neon-cyan/50"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`w-6 h-6 flex items-center justify-center border ${playerState?.choice === i ? "bg-neon-cyan text-bg-dark border-neon-cyan" : "border-neon-cyan/30"}`}>
+                        {i + 1}
+                      </div>
+                      <span className="text-sm font-bold uppercase italic tracking-tight">{opt}</span>
+                    </div>
+                    {playerState?.choice === i && <CheckCircle2 size={16} className="absolute top-2 right-2 text-neon-cyan" />}
+                  </button>
+                ))}
+              </div>
+
+              {playerState?.choice !== undefined && (
+                <div className="text-center p-6 bg-surface-dark border border-dashed border-neon-cyan/30">
+                  <Loader2 className="w-8 h-8 text-neon-cyan animate-spin mx-auto mb-3" />
+                  <p className="text-xs font-bold text-neon-cyan uppercase tracking-widest animate-pulse">
+                    ESPERANDO A LOS DEMÁS JUGADORES...
+                  </p>
+                  <div className="flex justify-center gap-2 mt-4">
+                    {(Object.values(session?.players || {}) as PlayerState[]).map((p, i) => (
+                      <div key={i} className={`w-2 h-2 ${p.choice !== undefined ? "bg-neon-cyan shadow-[0_0_5px_rgba(0,243,255,0.8)]" : "bg-white/10"}`} />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </>
           )}
         </ScreenWrapper>
 
@@ -629,39 +786,67 @@ export default function App() {
         <ScreenWrapper isVisible={screen === "revealing"}>
           <ProgressBar step={4} totalSteps={6} label="Paso 4 de 6 · Revelación" />
           
-          <div className="text-center mb-8">
-            <span className="text-[10px] text-neon-pink uppercase tracking-widest font-bold mb-1 block">RESILIENCIA COLECTIVA</span>
-            <div className="text-6xl font-black text-neon-yellow italic cyberpunk mb-2">
-              {session?.score}<span className="text-2xl text-neon-cyan">PTS</span>
-            </div>
-            <p className="text-xs text-neon-cyan/60 uppercase font-bold">
-              {session?.score === 30 ? "UNANIMIDAD TOTAL: EL SISTEMA RESISTE" : 
-               session?.score === 20 ? "ACUERDO PARCIAL: FRAGMENTACIÓN DETECTADA" : 
-               "CAOS ABSOLUTO: EL SISTEMA COLAPSA"}
-            </p>
-          </div>
-
-          <div className="space-y-4 mb-8">
-            <h3 className="text-sm font-black text-neon-cyan uppercase tracking-widest border-b border-neon-cyan/20 pb-1">DECISIONES DEL GRUPO</h3>
-            {(Object.values(session?.players || {}) as PlayerState[]).map((p, i) => (
-              <div key={i} className="bg-surface-dark p-4 border-l-4 border-neon-pink relative">
-                <div className="text-[9px] text-neon-pink font-bold uppercase mb-1">{p.name} // {ROLES.find(r => r.id === p.roleId)?.name}</div>
-                <p className="text-sm font-bold text-white italic">"{currentDisruption?.opciones[p.choice!] || "Sin elección"}"</p>
+          {session?.mode === "solo" && soloHorizonId ? (
+            <div className="flex-1 flex flex-col">
+              <div className="text-center mb-8">
+                <span className="text-[10px] text-neon-yellow uppercase tracking-widest font-black mb-1 block">HORIZONTE ALCANZADO</span>
+                <h2 className={`text-4xl font-black italic cyberpunk mb-4 uppercase leading-none ${
+                  HORIZONTES[soloHorizonId].color === 'hack-cyan' ? 'text-neon-cyan' : 
+                  HORIZONTES[soloHorizonId].color === 'hack-pink' ? 'text-neon-pink' : 'text-neon-yellow'
+                }`}>
+                  {HORIZONTES[soloHorizonId].titulo}
+                </h2>
+                <div className="w-full h-[2px] bg-gradient-to-r from-transparent via-white/20 to-transparent mb-6" />
+                <p className="text-sm text-white/90 leading-relaxed italic bg-surface-dark p-6 border-l-4 border-neon-cyan">
+                  {HORIZONTES[soloHorizonId].descripcion}
+                </p>
               </div>
-            ))}
-          </div>
 
-          <div className="bg-neon-yellow/10 border-2 border-neon-yellow p-5 mb-8 relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-1 bg-neon-yellow animate-pulse" />
-            <span className="text-[10px] text-neon-yellow font-bold uppercase block mb-2 font-mono">ARCHIVO_REAL_DETECTADO</span>
-            <p className="text-xs text-white font-medium leading-relaxed italic">
-              {(() => {
-                const roleIndex = ROLES.findIndex(r => r.id === playerState?.roleId) + 1;
-                const key = `${session?.shockId}-${roleIndex}`;
-                return TITULARES[key] || TITULARES[`${session?.shockId}-1`] || "No hay titular disponible para esta combinación.";
-              })()}
-            </p>
-          </div>
+              <div className="bg-neon-yellow/10 border-2 border-neon-yellow p-5 mb-8 relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-1 bg-neon-yellow animate-pulse" />
+                <span className="text-[10px] text-neon-yellow font-bold uppercase block mb-2 font-mono">ARCHIVO_REAL_DETECTADO</span>
+                <p className="text-xs text-white font-medium leading-relaxed italic">
+                  {TITULARES[`${session?.shockId}-1`] || "No hay titular disponible para esta combinación."}
+                </p>
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="text-center mb-8">
+                <span className="text-[10px] text-neon-pink uppercase tracking-widest font-bold mb-1 block">RESILIENCIA COLECTIVA</span>
+                <div className="text-6xl font-black text-neon-yellow italic cyberpunk mb-2">
+                  {session?.score}<span className="text-2xl text-neon-cyan">PTS</span>
+                </div>
+                <p className="text-xs text-neon-cyan/60 uppercase font-bold">
+                  {session?.score === 30 ? "UNANIMIDAD TOTAL: EL SISTEMA RESISTE" : 
+                   session?.score === 20 ? "ACUERDO PARCIAL: FRAGMENTACIÓN DETECTADA" : 
+                   "CAOS ABSOLUTO: EL SISTEMA COLAPSA"}
+                </p>
+              </div>
+
+              <div className="space-y-4 mb-8">
+                <h3 className="text-sm font-black text-neon-cyan uppercase tracking-widest border-b border-neon-cyan/20 pb-1">DECISIONES DEL GRUPO</h3>
+                {(Object.values(session?.players || {}) as PlayerState[]).map((p, i) => (
+                  <div key={i} className="bg-surface-dark p-4 border-l-4 border-neon-pink relative">
+                    <div className="text-[9px] text-neon-pink font-bold uppercase mb-1">{p.name} // {ROLES.find(r => r.id === p.roleId)?.name}</div>
+                    <p className="text-sm font-bold text-white italic">"{currentDisruption?.opciones[p.choice!] || "Sin elección"}"</p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="bg-neon-yellow/10 border-2 border-neon-yellow p-5 mb-8 relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-1 bg-neon-yellow animate-pulse" />
+                <span className="text-[10px] text-neon-yellow font-bold uppercase block mb-2 font-mono">ARCHIVO_REAL_DETECTADO</span>
+                <p className="text-xs text-white font-medium leading-relaxed italic">
+                  {(() => {
+                    const roleIndex = ROLES.findIndex(r => r.id === playerState?.roleId) + 1;
+                    const key = `${session?.shockId}-${roleIndex}`;
+                    return TITULARES[key] || TITULARES[`${session?.shockId}-1`] || "No hay titular disponible para esta combinación.";
+                  })()}
+                </p>
+              </div>
+            </>
+          )}
 
           <Button onClick={finishGame}>
             CONTINUAR AL ANÁLISIS →
